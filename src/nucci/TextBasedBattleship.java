@@ -9,24 +9,34 @@ import java.util.Scanner;
  */
 public class TextBasedBattleship {
 	public static boolean onePlayer = false;
-	
+
 	public static void main(String[] args) {
 		Scanner read = new Scanner(System.in);
-		
-		String userInput = "";
-		
+
+		String numberOfPlayers = "";
+
+		boolean[] error = new boolean[10];
+
 		char[][] field = new char[10][10];
-		for(int i = 0; i < 10; i++){
-			for (int j = 0; j < 10; j++){
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
 				field[i][j] = '~';
 			}
 		}
-		
+
 		System.out.println("Please enter the number of players (One / Two)");
-		userInput = read.nextLine();
-		
-		
-		
+		while (!error[0]) {
+			numberOfPlayers = read.nextLine();
+			if (numberOfPlayers.equalsIgnoreCase("One")) {
+				onePlayer = true;
+			}
+			else if (numberOfPlayers.equalsIgnoreCase("Two")) {
+				onePlayer = false;
+			}
+			else {
+
+			}
+		}
 		printPlayerField(field);
 
 	}
@@ -35,9 +45,9 @@ public class TextBasedBattleship {
 	 * This method prints the field according to the char[][] of field elements
 	 * 
 	 * @param playerElements
-	 * 			- char[][] The predetermined field elements
+	 *            - char[][] The predetermined field elements
 	 */
-	public static void printPlayerField (char[][] playerElements){
+	public static void printPlayerField(char[][] playerElements) {
 		System.out.println("    1   2   3   4   5   6   7   8   9  10  ");
 		System.out.println("  <--------------------------------------->");
 		System.out.println("a | " + playerElements[0][0] + " | " + playerElements[0][1] + " | " + playerElements[0][2] + " | " + playerElements[0][3] + " | " + playerElements[0][4] + " | " + playerElements[0][5] + " | " + playerElements[0][6] + " | " + playerElements[0][7] + " | " + playerElements[0][8] + " | " + playerElements[0][9] + " |");
@@ -62,9 +72,61 @@ public class TextBasedBattleship {
 		System.out.println("  <--------------------------------------->");
 
 	}
-	public static int[] makeCoords (String x, String y){
+	/**
+	 * 
+	 * @param userInput
+	 * @return
+	 * @formatter:off
+	 */
+	public static int[] makeCoords (String userInput){
+		String[] splitInput = userInput.split(", ");
+		int[] coordinants = new int[2];
 		
-		return null;
+		coordinants[1] = Integer.parseInt(splitInput[1]);
+		
+		switch(splitInput[0]){
+			case "A" : coordinants[0] = 0;
+			break;
+			case "a" : coordinants[0] = 0;
+			break;
+			case "B" : coordinants[0] = 1;
+			break;
+			case "b" : coordinants[0] = 1;
+			break;
+			case "C" : coordinants[0] = 2;
+			break;
+			case "D" : coordinants[0] = 2;
+			break;
+			case "d" : coordinants[0] = 3;
+			break;
+			case "E" : coordinants[0] = 4;
+			break;
+			case "e" : coordinants[0] = 4;
+			break;
+			case "F" : coordinants[0] = 5;
+			break;
+			case "f" : coordinants[0] = 5;
+			break;
+			case "G" : coordinants[0] = 6;
+			break;
+			case "g" : coordinants[0] = 6;
+			break;
+			case "H" : coordinants[0] = 7;
+			break;
+			case "h" : coordinants[0] = 7;
+			break;
+			case "I" : coordinants[0] = 8;
+			break;
+			case "i" : coordinants[0] = 8;
+			break;
+			case "J" : coordinants[0] = 9;
+			break;
+			case "j" : coordinants[0] = 9;
+			break;
+		}
+		
+		
+		return coordinants;
 		
 	}
 }
