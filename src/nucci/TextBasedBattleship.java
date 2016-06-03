@@ -8,8 +8,14 @@ import java.util.Scanner;
  * 
  */
 public class TextBasedBattleship {
+
 	public static boolean onePlayer = false;
 
+	/**
+	 * This is the main method
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Scanner read = new Scanner(System.in);
 
@@ -25,19 +31,28 @@ public class TextBasedBattleship {
 		}
 
 		System.out.println("Please enter the number of players (One / Two)");
-		while (!error[0]) {
+		do {
 			numberOfPlayers = read.nextLine();
 			if (numberOfPlayers.equalsIgnoreCase("One")) {
 				onePlayer = true;
+				error[0] = false;
 			}
 			else if (numberOfPlayers.equalsIgnoreCase("Two")) {
 				onePlayer = false;
+				error[0] = false;
 			}
 			else {
+				System.out.println("Please enter a valid answer");
+				error[0] = true;
+			}
+		} while (error[0]);
 
+		if (numberOfPlayers() == 1) {
+			for (int i = 0; i < 5; i++) {
+				printPlayerField(field);
+				System.out.println("Where would you like to put your ship?");
 			}
 		}
-		printPlayerField(field);
 
 	}
 
@@ -73,17 +88,21 @@ public class TextBasedBattleship {
 
 	}
 	/**
+	 * This method turns a user input to 
 	 * 
 	 * @param userInput
-	 * @return
-	 * @formatter:off
+	 * 			- String the users input to be turned into coordinatnts
+	 * @return an array of the coordinants for the board (minimum of 0, 0 and maximum 9, 9) and returns -1 if invalid  
+//	 * @formatter:off
 	 */
 	public static int[] makeCoords (String userInput){
 		String[] splitInput = userInput.split(", ");
 		int[] coordinants = new int[2];
-		
-		coordinants[1] = Integer.parseInt(splitInput[1]);
-		
+		try {
+			coordinants[1] = Integer.parseInt(splitInput[1]);
+		}catch(NumberFormatException ie){
+			coordinants[1] = -1;
+		}
 		switch(splitInput[0]){
 			case "A" : coordinants[0] = 0;
 			break;
@@ -123,10 +142,25 @@ public class TextBasedBattleship {
 			break;
 			case "j" : coordinants[0] = 9;
 			break;
+			default  : coordinants[0] = -1;
+			break;
 		}
-		
-		
 		return coordinants;
-		
+	}
+	/**
+	 * This method returns the number of players in the current game
+	 * 
+	 * @return the number of players in the current game (-1 if invalid)
+	 * @formatter:on
+	 */
+	public static int numberOfPlayers() {
+		if (onePlayer) {
+			return 1;
+		}
+		else if (!onePlayer) {
+			return 2;
+		}
+		return -1;
+
 	}
 }
