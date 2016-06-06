@@ -33,6 +33,12 @@ public class TextBasedBattleship {
 
 		String[] listOfShips = {"Destroyer", "Cruiser", "Submarine", "Battleship", "Aircraft Carrier"};
 
+		String[] playerOneShipLocations = new String[5];
+		String[] playerTwoShipLocations = new String[5];
+		
+		String[] playerOneShipDirections = new String[5];
+		String[] playerTwoShipDirections = new String[5];
+		
 		System.out.println("Please enter the number of players (One / Two)");
 		do {
 			numberOfPlayers = read.nextLine();
@@ -53,17 +59,27 @@ public class TextBasedBattleship {
 		if (numberOfPlayers() == 1) {
 			for (int i = 0; i < 5; i++) {
 				printPlayerField(field);
-				System.out.println("Where would you like to put your " + listOfShips[i] + "?");
+				System.out.println("Where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
+				playerOneShipLocations[i] = read.nextLine();
+				System.out.println("What direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
+				playerOneShipDirections[i] = read.nextLine();
 			}
 		}
 		else if (numberOfPlayers() == 2) {
 			for (int i = 0; i < 5; i++) {
 				printPlayerField(field);
-				System.out.println("Where would you like to put your " + listOfShips[i] + "?");
+				System.out.println("Player 1 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
+				playerOneShipLocations[i] = read.nextLine();
+				System.out.println("Player 1 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
+				playerOneShipDirections[i] = read.nextLine();
+				
 			}
 			for (int i = 0; i < 5; i++) {
 				printPlayerField(field);
-				System.out.println("Where would you like to put your " + listOfShips[i] + "?");
+				System.out.println("Player 2 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
+				playerTwoShipLocations[i] = read.nextLine();
+				System.out.println("Player 2 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
+				playerTwoShipDirections[i] = read.nextLine();
 			}
 		}
 
@@ -177,7 +193,7 @@ public class TextBasedBattleship {
 	}
 
 	/**
-	 * This method places a ship in the desired location on the board
+	 * This method checks if a places a ship in the desired location on the board
 	 * 
 	 * @param playerElements
 	 *            char[][] - the board
@@ -187,9 +203,9 @@ public class TextBasedBattleship {
 	 *            String - the type of ship (e.g. battleship, cruiser, submarine)
 	 * @param direction
 	 *            String - the direction (e.g. up, down, left, right)
-	 * @return the updated board (null if invalid parameters)
+	 * @return if the ship placements is valid
 	 */
-	public static char[][] addShip(char[][] playerElements, int[] coordinants, String shipType, String direction) {
+	public static boolean isValidShip(char[][] playerElements, int[] coordinants, String shipType, String direction){
 		int shipSize = 0;
 
 		if (shipType.equalsIgnoreCase("Destroyer")) {
@@ -204,16 +220,105 @@ public class TextBasedBattleship {
 		else if (shipType.equalsIgnoreCase("Aircraft Carrier")) {
 			shipSize = 5;
 		}
-		else {
-			return null;
+		
+		if (direction.equalsIgnoreCase("down")) {
+			for (int i = 0; i < shipSize; i++) {
+				try {
+					if (playerElements[coordinants[0] + i][coordinants[1]] == '#'){
+						int error  = 1 / 0;
+					}
+					playerElements[coordinants[0] + i][coordinants[1]] = '~';
+				}
+				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
+					return false;
+				}
+			}
 		}
+		else if (direction.equalsIgnoreCase("right")) {
+			for (int i = 0; i < shipSize; i++) {
+				try {
+					if (playerElements[coordinants[0]][coordinants[1] + i] == '#'){
+						int error  = 1 / 0;
+					}
+					playerElements[coordinants[0]][coordinants[1] + i] = '~';
+				}
+				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
+					return false;
+				}
+			}
+		}
+		else if (direction.equalsIgnoreCase("up")) {
+			for (int i = 0; i < shipSize; i++) {
+				try {
+					if (playerElements[coordinants[0] - i][coordinants[1]] == '#'){
+						int error  = 1 / 0;
+					}
+					playerElements[coordinants[0] - i][coordinants[1]] = '~';
+				}
+				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
+					return false;
+				}
+			}
+		}
+		else if (direction.equalsIgnoreCase("left")) {
+			for (int i = 0; i < shipSize; i++) {
+				try {
+					if (playerElements[coordinants[0]][coordinants[1] - i] == '#'){
+						int error  = 1 / 0;
+					}
+					playerElements[coordinants[0]][coordinants[1] - i] = '~';
+				}
+				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
+					return false;
+				}
+			}
+		}
+		else{
+			return false;
+		}
+	
+		return true;
+	}
+	
+	
+	
+	
+	/**
+	 * This method places a ship in the desired location on the board
+	 * 
+	 * @param playerElements
+	 *            char[][] - the board
+	 * @param coordinants
+	 *            int[] - the coordinants on the board where the ship is to be placed
+	 * @param shipType
+	 *            String - the type of ship (e.g. battleship, cruiser, submarine)
+	 * @param direction
+	 *            String - the direction (e.g. up, down, left, right)
+	 * @return (never returns) this method edits the main board array
+	 */
+	public static void addShip(char[][] playerElements, int[] coordinants, String shipType, String direction) {
+		int shipSize = 0;
+
+		if (shipType.equalsIgnoreCase("Destroyer")) {
+			shipSize = 2;
+		}
+		else if (shipType.equalsIgnoreCase("Cruiser") || shipType.equalsIgnoreCase("Submarine")) {
+			shipSize = 3;
+		}
+		else if (shipType.equalsIgnoreCase("Battleship")) {
+			shipSize = 4;
+		}
+		else if (shipType.equalsIgnoreCase("Aircraft Carrier")) {
+			shipSize = 5;
+		}
+		
 		if (direction.equalsIgnoreCase("down")) {
 			for (int i = 0; i < shipSize; i++) {
 				try {
 					playerElements[coordinants[0] + i][coordinants[1]] = '#';
 				}
 				catch (ArrayIndexOutOfBoundsException ie) {
-					return null;
+					break;
 				}
 			}
 		}
@@ -223,7 +328,7 @@ public class TextBasedBattleship {
 					playerElements[coordinants[0]][coordinants[1] + i] = '#';
 				}
 				catch (ArrayIndexOutOfBoundsException ie) {
-					return null;
+					break;
 				}
 			}
 		}
@@ -233,7 +338,7 @@ public class TextBasedBattleship {
 					playerElements[coordinants[0] - i][coordinants[1]] = '#';
 				}
 				catch (ArrayIndexOutOfBoundsException ie) {
-					return null;
+					break;
 				}
 			}
 		}
@@ -243,13 +348,20 @@ public class TextBasedBattleship {
 					playerElements[coordinants[0]][coordinants[1] - i] = '#';
 				}
 				catch (ArrayIndexOutOfBoundsException ie) {
-					return null;
+					break;
 				}
 			}
 		}
 		else {
-			return null;
 		}
-		return playerElements;
 	}
 }
+
+
+
+
+
+
+
+
+
