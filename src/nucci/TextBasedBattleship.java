@@ -3,9 +3,9 @@ package nucci;
 import java.util.Scanner;
 
 /**
+ * This program is a text based battleship game
  * @version June 1st, 2016
  * @author Daniel Nucci
- * 
  */
 public class TextBasedBattleship {
 
@@ -15,6 +15,7 @@ public class TextBasedBattleship {
 	 * This is the main method
 	 * 
 	 * @param args
+	 *            String[]
 	 */
 	public static void main(String[] args) {
 		@SuppressWarnings("resource")
@@ -22,23 +23,36 @@ public class TextBasedBattleship {
 
 		String numberOfPlayers = "";
 
+		int[] currentCoordinants = new int[2];
+
 		boolean[] error = new boolean[10];
 
-		char[][] field = new char[10][10];
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				field[i][j] = '~';
+		char[][] playerOneField = new char[10][10];
+		for (int i = 0; i < playerOneField.length; i++) {
+			for (int j = 0; j < playerOneField[0].length; j++) {
+				playerOneField[i][j] = '~';
+			}
+		}
+		char[][] playerTwoField = new char[10][10];
+		for (int i = 0; i < playerTwoField.length; i++) {
+			for (int j = 0; j < playerTwoField[0].length; j++) {
+				playerTwoField[i][j] = '~';
 			}
 		}
 
 		String[] listOfShips = {"Destroyer", "Cruiser", "Submarine", "Battleship", "Aircraft Carrier"};
 
+		String[][] playerOneShips = new String[10][10];
+		String[][] playerTwoShips = new String[10][10];
+		
 		String[] playerOneShipLocations = new String[5];
 		String[] playerTwoShipLocations = new String[5];
-		
+
 		String[] playerOneShipDirections = new String[5];
 		String[] playerTwoShipDirections = new String[5];
+
 		
+		//start of the priliminary game
 		System.out.println("Please enter the number of players (One / Two)");
 		do {
 			numberOfPlayers = read.nextLine();
@@ -58,29 +72,61 @@ public class TextBasedBattleship {
 
 		if (numberOfPlayers() == 1) {
 			for (int i = 0; i < 5; i++) {
-				printPlayerField(field);
 				System.out.println("Where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
 				playerOneShipLocations[i] = read.nextLine();
+				currentCoordinants = makeCoords(playerOneShipLocations[i]);
 				System.out.println("What direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
 				playerOneShipDirections[i] = read.nextLine();
+				if (isValidShip(playerOneField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
+					addShip(playerOneField, playerOneShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
+				}
+				else {
+					System.out.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					i--;
+				}
+				printPlayerField(playerOneField);
 			}
+			System.out.println("The AI will now set its field");
+			
 		}
 		else if (numberOfPlayers() == 2) {
+			System.out.println("Player 2 please look away from the screen as Player 1 inputs his ships.");
 			for (int i = 0; i < 5; i++) {
-				printPlayerField(field);
 				System.out.println("Player 1 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
 				playerOneShipLocations[i] = read.nextLine();
+				currentCoordinants = makeCoords(playerOneShipLocations[i]);
 				System.out.println("Player 1 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
 				playerOneShipDirections[i] = read.nextLine();
-				
+				if (isValidShip(playerOneField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
+					addShip(playerOneField, playerOneShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
+				}
+				else {
+					System.out.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					i--;
+				}
+				printPlayerField(playerOneField);
 			}
+			System.out.println("Player 1 please look away from the screen as Player 2 inputs his ships.");
 			for (int i = 0; i < 5; i++) {
-				printPlayerField(field);
 				System.out.println("Player 2 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
 				playerTwoShipLocations[i] = read.nextLine();
+				currentCoordinants = makeCoords(playerOneShipLocations[i]);
 				System.out.println("Player 2 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
 				playerTwoShipDirections[i] = read.nextLine();
+				if (isValidShip(playerTwoField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
+					addShip(playerTwoField, playerTwoShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
+				}
+				else {
+					System.out.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					i--;
+				}
+				printPlayerField(playerTwoField);
 			}
+		}
+		//end of the priliminary game and the start of the battling portion
+		
+		while(isAlive(playerOneField) || isAlive(playerTwoField)){
+			
 		}
 
 	}
@@ -116,20 +162,21 @@ public class TextBasedBattleship {
 		System.out.println("  <--------------------------------------->");
 
 	}
+
+	//@formatter:off
 	/**
 	 * This method turns a user input to 
 	 * 
 	 * @param userInput
 	 * 			- String the users input to be turned into coordinatnts
 	 * @return an array of the coordinants for the board (minimum of 0, 0 and maximum 9, 9) and returns -1 if invalid  
-//	 * @formatter:off
 	 */
 	public static int[] makeCoords (String userInput){
 		String[] splitInput = userInput.split(", ");
 		int[] coordinants = new int[2];
 		try {
-			coordinants[1] = Integer.parseInt(splitInput[1]);
-		}catch(NumberFormatException ie){
+			coordinants[1] = Integer.parseInt(splitInput[1]) - 1;
+		}catch(NumberFormatException | ArrayIndexOutOfBoundsException ie){
 			coordinants[1] = -1;
 		}
 		switch(splitInput[0]){
@@ -176,11 +223,12 @@ public class TextBasedBattleship {
 		}
 		return coordinants;
 	}
+	
+	//@formatter:on
 	/**
 	 * This method returns the number of players in the current game
 	 * 
 	 * @return the number of players in the current game (-1 if invalid)
-	 * @formatter:on
 	 */
 	public static int numberOfPlayers() {
 		if (onePlayer) {
@@ -205,7 +253,7 @@ public class TextBasedBattleship {
 	 *            String - the direction (e.g. up, down, left, right)
 	 * @return if the ship placements is valid
 	 */
-	public static boolean isValidShip(char[][] playerElements, int[] coordinants, String shipType, String direction){
+	public static boolean isValidShip(char[][] playerElements, int[] coordinants, String shipType, String direction) {
 		int shipSize = 0;
 
 		if (shipType.equalsIgnoreCase("Destroyer")) {
@@ -220,14 +268,14 @@ public class TextBasedBattleship {
 		else if (shipType.equalsIgnoreCase("Aircraft Carrier")) {
 			shipSize = 5;
 		}
-		
+
 		if (direction.equalsIgnoreCase("down")) {
 			for (int i = 0; i < shipSize; i++) {
 				try {
-					if (playerElements[coordinants[0] + i][coordinants[1]] == '#'){
-						int error  = 1 / 0;
+					if (playerElements[coordinants[0] + i][coordinants[1]] == '#') {
+						shipSize = 1 / 0;
 					}
-					playerElements[coordinants[0] + i][coordinants[1]] = '~';
+					playerElements[coordinants[0] + i][coordinants[1]] = playerElements[coordinants[0] + i][coordinants[1]];
 				}
 				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
 					return false;
@@ -237,10 +285,10 @@ public class TextBasedBattleship {
 		else if (direction.equalsIgnoreCase("right")) {
 			for (int i = 0; i < shipSize; i++) {
 				try {
-					if (playerElements[coordinants[0]][coordinants[1] + i] == '#'){
-						int error  = 1 / 0;
+					if (playerElements[coordinants[0]][coordinants[1] + i] == '#') {
+						shipSize = 1 / 0;
 					}
-					playerElements[coordinants[0]][coordinants[1] + i] = '~';
+					playerElements[coordinants[0]][coordinants[1] + i] = playerElements[coordinants[0]][coordinants[1] + i];
 				}
 				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
 					return false;
@@ -250,10 +298,10 @@ public class TextBasedBattleship {
 		else if (direction.equalsIgnoreCase("up")) {
 			for (int i = 0; i < shipSize; i++) {
 				try {
-					if (playerElements[coordinants[0] - i][coordinants[1]] == '#'){
-						int error  = 1 / 0;
+					if (playerElements[coordinants[0] - i][coordinants[1]] == '#') {
+						shipSize = 1 / 0;
 					}
-					playerElements[coordinants[0] - i][coordinants[1]] = '~';
+					playerElements[coordinants[0] - i][coordinants[1]] = playerElements[coordinants[0] - i][coordinants[1]];
 				}
 				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
 					return false;
@@ -263,26 +311,22 @@ public class TextBasedBattleship {
 		else if (direction.equalsIgnoreCase("left")) {
 			for (int i = 0; i < shipSize; i++) {
 				try {
-					if (playerElements[coordinants[0]][coordinants[1] - i] == '#'){
-						int error  = 1 / 0;
+					if (playerElements[coordinants[0]][coordinants[1] - i] == '#') {
+						shipSize = 1 / 0;
 					}
-					playerElements[coordinants[0]][coordinants[1] - i] = '~';
+					playerElements[coordinants[0]][coordinants[1] - i] = playerElements[coordinants[0]][coordinants[1] - i];
 				}
 				catch (ArrayIndexOutOfBoundsException | ArithmeticException ie) {
 					return false;
 				}
 			}
 		}
-		else{
+		else {
 			return false;
 		}
-	
 		return true;
 	}
-	
-	
-	
-	
+
 	/**
 	 * This method places a ship in the desired location on the board
 	 * 
@@ -296,7 +340,7 @@ public class TextBasedBattleship {
 	 *            String - the direction (e.g. up, down, left, right)
 	 * @return (never returns) this method edits the main board array
 	 */
-	public static void addShip(char[][] playerElements, int[] coordinants, String shipType, String direction) {
+	public static void addShip(char[][] playerElements, String[][] shipPlacement, int[] coordinants, String shipType, String direction) {
 		int shipSize = 0;
 
 		if (shipType.equalsIgnoreCase("Destroyer")) {
@@ -311,57 +355,41 @@ public class TextBasedBattleship {
 		else if (shipType.equalsIgnoreCase("Aircraft Carrier")) {
 			shipSize = 5;
 		}
-		
+
 		if (direction.equalsIgnoreCase("down")) {
 			for (int i = 0; i < shipSize; i++) {
-				try {
 					playerElements[coordinants[0] + i][coordinants[1]] = '#';
-				}
-				catch (ArrayIndexOutOfBoundsException ie) {
-					break;
-				}
+					shipPlacement [coordinants[0] + i][coordinants[1]] = shipType;
 			}
 		}
 		else if (direction.equalsIgnoreCase("right")) {
 			for (int i = 0; i < shipSize; i++) {
-				try {
 					playerElements[coordinants[0]][coordinants[1] + i] = '#';
-				}
-				catch (ArrayIndexOutOfBoundsException ie) {
-					break;
-				}
+					shipPlacement [coordinants[0]][coordinants[1] + i] = shipType;
 			}
 		}
 		else if (direction.equalsIgnoreCase("up")) {
 			for (int i = 0; i < shipSize; i++) {
-				try {
 					playerElements[coordinants[0] - i][coordinants[1]] = '#';
-				}
-				catch (ArrayIndexOutOfBoundsException ie) {
-					break;
-				}
+					shipPlacement [coordinants[0] - i][coordinants[1]] = shipType;
 			}
 		}
 		else if (direction.equalsIgnoreCase("left")) {
 			for (int i = 0; i < shipSize; i++) {
-				try {
 					playerElements[coordinants[0]][coordinants[1] - i] = '#';
-				}
-				catch (ArrayIndexOutOfBoundsException ie) {
-					break;
-				}
+					shipPlacement [coordinants[0]][coordinants[1] - i] = shipType;
 			}
 		}
-		else {
-		}
+	}
+
+	public static void makeAIField(char[][] playerElements){
+		
+	}
+	
+	public static boolean isAlive(char[][] fieldElements){
+		
+		
+		
+		return true;
 	}
 }
-
-
-
-
-
-
-
-
-
