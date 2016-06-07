@@ -71,6 +71,7 @@ public class TextBasedBattleship {
 		} while (error[0]);
 
 		if (numberOfPlayers() == 1) {
+			printPlayerField(playerOneField);
 			for (int i = 0; i < 5; i++) {
 				System.out.println("Where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
 				playerOneShipLocations[i] = read.nextLine();
@@ -91,6 +92,7 @@ public class TextBasedBattleship {
 		}
 		else if (numberOfPlayers() == 2) {
 			System.out.println("Player 2 please look away from the screen as Player 1 inputs his ships.");
+			printPlayerField(playerOneField);
 			for (int i = 0; i < 5; i++) {
 				System.out.println("Player 1 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
 				playerOneShipLocations[i] = read.nextLine();
@@ -107,6 +109,7 @@ public class TextBasedBattleship {
 				printPlayerField(playerOneField);
 			}
 			System.out.println("Player 1 please look away from the screen as Player 2 inputs his ships.");
+			printPlayerField(playerTwoField);
 			for (int i = 0; i < 5; i++) {
 				System.out.println("Player 2 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
 				playerTwoShipLocations[i] = read.nextLine();
@@ -126,7 +129,7 @@ public class TextBasedBattleship {
 		//end of the priliminary game and the start of the battling portion
 		
 		while(isAlive(playerOneField) || isAlive(playerTwoField)){
-			
+			break;
 		}
 
 	}
@@ -190,7 +193,9 @@ public class TextBasedBattleship {
 			break;
 			case "C" : coordinants[0] = 2;
 			break;
-			case "D" : coordinants[0] = 2;
+			case "c" : coordinants[0] = 2;
+			break;
+			case "D" : coordinants[0] = 3;
 			break;
 			case "d" : coordinants[0] = 3;
 			break;
@@ -331,13 +336,15 @@ public class TextBasedBattleship {
 	 * This method places a ship in the desired location on the board
 	 * 
 	 * @param playerElements
-	 *            char[][] - the board
+	 * 			char[][] - the board
+	 * @param shipPlacement
+	 * 			String[][] - the location of each individual ship for recording purposes
 	 * @param coordinants
-	 *            int[] - the coordinants on the board where the ship is to be placed
+	 *          int[] - the coordinants on the board where the ship is to be placed
 	 * @param shipType
-	 *            String - the type of ship (e.g. battleship, cruiser, submarine)
+	 *          String - the type of ship (e.g. battleship, cruiser, submarine)
 	 * @param direction
-	 *            String - the direction (e.g. up, down, left, right)
+	 *          String - the direction (e.g. up, down, left, right)
 	 * @return (never returns) this method edits the main board array
 	 */
 	public static void addShip(char[][] playerElements, String[][] shipPlacement, int[] coordinants, String shipType, String direction) {
@@ -382,14 +389,49 @@ public class TextBasedBattleship {
 		}
 	}
 
-	public static void makeAIField(char[][] playerElements){
-		
+	public static void makeAIField(char[][] playerElements, String[] ships){
+		for (int i = 0; i < 5; i++){
+			int randomDirection = (int) ((Math.random() * 4) + 1);
+			String directionWord = "";
+			switch(randomDirection){
+				case 1 : directionWord = "up";
+				break;
+				case 2 : directionWord = "right";
+				break;
+				case 3 : directionWord = "down";
+				break;
+				default : directionWord = "left";
+				break;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		}
 	}
 	
+	/**
+	 * This method returns if there is a ship left on the field
+	 * 
+	 * @param fieldElements
+	 * 			char[][] - the board
+	 * @return if the field has a ship on it
+	 */
 	public static boolean isAlive(char[][] fieldElements){
-		
-		
-		
-		return true;
+		for (int i = 0; i < fieldElements.length; i++){
+			for (int j = 0; j < fieldElements[0].length; j++){
+				if (fieldElements[i][j] == '#'){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
