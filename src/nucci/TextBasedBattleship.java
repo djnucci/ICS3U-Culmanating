@@ -2,25 +2,26 @@ package nucci;
 
 import java.util.Scanner;
 
+import hsa_new.Console;
+
 /**
  * This program is a text based battleship game
+ * 
  * @version June 1st, 2016
  * @author Daniel Nucci
  */
 public class TextBasedBattleship {
 
 	public static boolean onePlayer = false;
-
+	public static Console console = new Console();
 	/**
 	 * This is the main method
 	 * 
 	 * @param args
 	 *            String[]
+	 * @throws InterruptedException
 	 */
-	public static void main(String[] args) {
-		@SuppressWarnings("resource")
-		Scanner read = new Scanner(System.in);
-
+	public static void main(String[] args) throws InterruptedException {
 		String numberOfPlayers = "";
 
 		int[] currentCoordinants = new int[2];
@@ -44,18 +45,17 @@ public class TextBasedBattleship {
 
 		String[][] playerOneShips = new String[10][10];
 		String[][] playerTwoShips = new String[10][10];
-		
+
 		String[] playerOneShipLocations = new String[5];
 		String[] playerTwoShipLocations = new String[5];
 
 		String[] playerOneShipDirections = new String[5];
 		String[] playerTwoShipDirections = new String[5];
 
-		
-		//start of the priliminary game
-		System.out.println("Please enter the number of players (One / Two)");
+		// start of the priliminary game
+		console.println("Please enter the number of players (One / Two)");
 		do {
-			numberOfPlayers = read.nextLine();
+			numberOfPlayers = console.readLine();
 			if (numberOfPlayers.equalsIgnoreCase("One")) {
 				onePlayer = true;
 				error[0] = false;
@@ -65,70 +65,83 @@ public class TextBasedBattleship {
 				error[0] = false;
 			}
 			else {
-				System.out.println("Please enter a valid answer");
+				console.println("Please enter a valid answer");
+				Thread.sleep(1000);
 				error[0] = true;
 			}
 		} while (error[0]);
-
+		console.clear();
 		if (numberOfPlayers() == 1) {
 			printPlayerField(playerOneField);
 			for (int i = 0; i < 5; i++) {
-				System.out.println("Where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
-				playerOneShipLocations[i] = read.nextLine();
+				console.println("Where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
+				playerOneShipLocations[i] = console.readLine();
 				currentCoordinants = makeCoords(playerOneShipLocations[i]);
-				System.out.println("What direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
-				playerOneShipDirections[i] = read.nextLine();
+				console.println("What direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
+				playerOneShipDirections[i] = console.readLine();
 				if (isValidShip(playerOneField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
 					addShip(playerOneField, playerOneShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
 				}
 				else {
-					System.out.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					console.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					Thread.sleep(2000);
 					i--;
 				}
+				console.clear();
 				printPlayerField(playerOneField);
 			}
-			System.out.println("The AI will now set its field");
-			
+			console.println("The AI will now set its field");
+
 		}
 		else if (numberOfPlayers() == 2) {
-			System.out.println("Player 2 please look away from the screen as Player 1 inputs his ships.");
+			console.clear();
+			console.println("Player 2 please look away from the screen as Player 1 inputs his ships.");
+			console.readChar();
+			console.clear();
 			printPlayerField(playerOneField);
 			for (int i = 0; i < 5; i++) {
-				System.out.println("Player 1 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
-				playerOneShipLocations[i] = read.nextLine();
+				console.println("Player 1 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
+				playerOneShipLocations[i] = console.readLine();
 				currentCoordinants = makeCoords(playerOneShipLocations[i]);
-				System.out.println("Player 1 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
-				playerOneShipDirections[i] = read.nextLine();
+				console.println("Player 1 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
+				playerOneShipDirections[i] = console.readLine();
 				if (isValidShip(playerOneField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
 					addShip(playerOneField, playerOneShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
 				}
 				else {
-					System.out.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					console.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					Thread.sleep(2000);
 					i--;
 				}
+				console.clear();
 				printPlayerField(playerOneField);
 			}
-			System.out.println("Player 1 please look away from the screen as Player 2 inputs his ships.");
+			console.clear();
+			console.println("Player 1 please look away from the screen as Player 2 inputs his ships.");
+			console.readChar();
+			console.clear();
 			printPlayerField(playerTwoField);
 			for (int i = 0; i < 5; i++) {
-				System.out.println("Player 2 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
-				playerTwoShipLocations[i] = read.nextLine();
+				console.println("Player 2 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
+				playerTwoShipLocations[i] = console.readLine();
 				currentCoordinants = makeCoords(playerOneShipLocations[i]);
-				System.out.println("Player 2 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
-				playerTwoShipDirections[i] = read.nextLine();
+				console.println("Player 2 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
+				playerTwoShipDirections[i] = console.readLine();
 				if (isValidShip(playerTwoField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
 					addShip(playerTwoField, playerTwoShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
 				}
 				else {
-					System.out.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					console.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
+					Thread.sleep(2000);
 					i--;
 				}
+				console.clear();
 				printPlayerField(playerTwoField);
 			}
 		}
-		//end of the priliminary game and the start of the battling portion
-		
-		while(isAlive(playerOneField) || isAlive(playerTwoField)){
+		// end of the priliminary game and the start of the battling portion
+
+		while (isAlive(playerOneField) || isAlive(playerTwoField)) {
 			break;
 		}
 
@@ -141,28 +154,28 @@ public class TextBasedBattleship {
 	 *            - char[][] The predetermined field elements
 	 */
 	public static void printPlayerField(char[][] playerElements) {
-		System.out.println("    1   2   3   4   5   6   7   8   9  10  ");
-		System.out.println("  <--------------------------------------->");
-		System.out.println("a | " + playerElements[0][0] + " | " + playerElements[0][1] + " | " + playerElements[0][2] + " | " + playerElements[0][3] + " | " + playerElements[0][4] + " | " + playerElements[0][5] + " | " + playerElements[0][6] + " | " + playerElements[0][7] + " | " + playerElements[0][8] + " | " + playerElements[0][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("b | " + playerElements[1][0] + " | " + playerElements[1][1] + " | " + playerElements[1][2] + " | " + playerElements[1][3] + " | " + playerElements[1][4] + " | " + playerElements[1][5] + " | " + playerElements[1][6] + " | " + playerElements[1][7] + " | " + playerElements[1][8] + " | " + playerElements[1][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("c | " + playerElements[2][0] + " | " + playerElements[2][1] + " | " + playerElements[2][2] + " | " + playerElements[2][3] + " | " + playerElements[2][4] + " | " + playerElements[2][5] + " | " + playerElements[2][6] + " | " + playerElements[2][7] + " | " + playerElements[2][8] + " | " + playerElements[2][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("d | " + playerElements[3][0] + " | " + playerElements[3][1] + " | " + playerElements[3][2] + " | " + playerElements[3][3] + " | " + playerElements[3][4] + " | " + playerElements[3][5] + " | " + playerElements[3][6] + " | " + playerElements[3][7] + " | " + playerElements[3][8] + " | " + playerElements[3][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("e | " + playerElements[4][0] + " | " + playerElements[4][1] + " | " + playerElements[4][2] + " | " + playerElements[4][3] + " | " + playerElements[4][4] + " | " + playerElements[4][5] + " | " + playerElements[4][6] + " | " + playerElements[4][7] + " | " + playerElements[4][8] + " | " + playerElements[4][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("f | " + playerElements[5][0] + " | " + playerElements[5][1] + " | " + playerElements[5][2] + " | " + playerElements[5][3] + " | " + playerElements[5][4] + " | " + playerElements[5][5] + " | " + playerElements[5][6] + " | " + playerElements[5][7] + " | " + playerElements[5][8] + " | " + playerElements[5][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("g | " + playerElements[6][0] + " | " + playerElements[6][1] + " | " + playerElements[6][2] + " | " + playerElements[6][3] + " | " + playerElements[6][4] + " | " + playerElements[6][5] + " | " + playerElements[6][6] + " | " + playerElements[6][7] + " | " + playerElements[6][8] + " | " + playerElements[6][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("h | " + playerElements[7][0] + " | " + playerElements[7][1] + " | " + playerElements[7][2] + " | " + playerElements[7][3] + " | " + playerElements[7][4] + " | " + playerElements[7][5] + " | " + playerElements[7][6] + " | " + playerElements[7][7] + " | " + playerElements[7][8] + " | " + playerElements[7][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("i | " + playerElements[8][0] + " | " + playerElements[8][1] + " | " + playerElements[8][2] + " | " + playerElements[8][3] + " | " + playerElements[8][4] + " | " + playerElements[8][5] + " | " + playerElements[8][6] + " | " + playerElements[8][7] + " | " + playerElements[8][8] + " | " + playerElements[8][9] + " |");
-		System.out.println("  |---------------------------------------|");
-		System.out.println("j | " + playerElements[9][0] + " | " + playerElements[9][1] + " | " + playerElements[9][2] + " | " + playerElements[9][3] + " | " + playerElements[9][4] + " | " + playerElements[9][5] + " | " + playerElements[9][6] + " | " + playerElements[9][7] + " | " + playerElements[9][8] + " | " + playerElements[9][9] + " |");
-		System.out.println("  <--------------------------------------->");
+		console.println("    1   2   3   4   5   6   7   8   9  10  ");
+		console.println("  /---------------------------------------\\");
+		console.println("a | " + playerElements[0][0] + " | " + playerElements[0][1] + " | " + playerElements[0][2] + " | " + playerElements[0][3] + " | " + playerElements[0][4] + " | " + playerElements[0][5] + " | " + playerElements[0][6] + " | " + playerElements[0][7] + " | " + playerElements[0][8] + " | " + playerElements[0][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("b | " + playerElements[1][0] + " | " + playerElements[1][1] + " | " + playerElements[1][2] + " | " + playerElements[1][3] + " | " + playerElements[1][4] + " | " + playerElements[1][5] + " | " + playerElements[1][6] + " | " + playerElements[1][7] + " | " + playerElements[1][8] + " | " + playerElements[1][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("c | " + playerElements[2][0] + " | " + playerElements[2][1] + " | " + playerElements[2][2] + " | " + playerElements[2][3] + " | " + playerElements[2][4] + " | " + playerElements[2][5] + " | " + playerElements[2][6] + " | " + playerElements[2][7] + " | " + playerElements[2][8] + " | " + playerElements[2][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("d | " + playerElements[3][0] + " | " + playerElements[3][1] + " | " + playerElements[3][2] + " | " + playerElements[3][3] + " | " + playerElements[3][4] + " | " + playerElements[3][5] + " | " + playerElements[3][6] + " | " + playerElements[3][7] + " | " + playerElements[3][8] + " | " + playerElements[3][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("e | " + playerElements[4][0] + " | " + playerElements[4][1] + " | " + playerElements[4][2] + " | " + playerElements[4][3] + " | " + playerElements[4][4] + " | " + playerElements[4][5] + " | " + playerElements[4][6] + " | " + playerElements[4][7] + " | " + playerElements[4][8] + " | " + playerElements[4][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("f | " + playerElements[5][0] + " | " + playerElements[5][1] + " | " + playerElements[5][2] + " | " + playerElements[5][3] + " | " + playerElements[5][4] + " | " + playerElements[5][5] + " | " + playerElements[5][6] + " | " + playerElements[5][7] + " | " + playerElements[5][8] + " | " + playerElements[5][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("g | " + playerElements[6][0] + " | " + playerElements[6][1] + " | " + playerElements[6][2] + " | " + playerElements[6][3] + " | " + playerElements[6][4] + " | " + playerElements[6][5] + " | " + playerElements[6][6] + " | " + playerElements[6][7] + " | " + playerElements[6][8] + " | " + playerElements[6][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("h | " + playerElements[7][0] + " | " + playerElements[7][1] + " | " + playerElements[7][2] + " | " + playerElements[7][3] + " | " + playerElements[7][4] + " | " + playerElements[7][5] + " | " + playerElements[7][6] + " | " + playerElements[7][7] + " | " + playerElements[7][8] + " | " + playerElements[7][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("i | " + playerElements[8][0] + " | " + playerElements[8][1] + " | " + playerElements[8][2] + " | " + playerElements[8][3] + " | " + playerElements[8][4] + " | " + playerElements[8][5] + " | " + playerElements[8][6] + " | " + playerElements[8][7] + " | " + playerElements[8][8] + " | " + playerElements[8][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("j | " + playerElements[9][0] + " | " + playerElements[9][1] + " | " + playerElements[9][2] + " | " + playerElements[9][3] + " | " + playerElements[9][4] + " | " + playerElements[9][5] + " | " + playerElements[9][6] + " | " + playerElements[9][7] + " | " + playerElements[9][8] + " | " + playerElements[9][9] + " |");
+		console.println("  \\---------------------------------------/");
 
 	}
 
@@ -336,15 +349,15 @@ public class TextBasedBattleship {
 	 * This method places a ship in the desired location on the board
 	 * 
 	 * @param playerElements
-	 * 			char[][] - the board
+	 *            char[][] - the board
 	 * @param shipPlacement
-	 * 			String[][] - the location of each individual ship for recording purposes
+	 *            String[][] - the location of each individual ship for recording purposes
 	 * @param coordinants
-	 *          int[] - the coordinants on the board where the ship is to be placed
+	 *            int[] - the coordinants on the board where the ship is to be placed
 	 * @param shipType
-	 *          String - the type of ship (e.g. battleship, cruiser, submarine)
+	 *            String - the type of ship (e.g. battleship, cruiser, submarine)
 	 * @param direction
-	 *          String - the direction (e.g. up, down, left, right)
+	 *            String - the direction (e.g. up, down, left, right)
 	 * @return (never returns) this method edits the main board array
 	 */
 	public static void addShip(char[][] playerElements, String[][] shipPlacement, int[] coordinants, String shipType, String direction) {
@@ -365,73 +378,80 @@ public class TextBasedBattleship {
 
 		if (direction.equalsIgnoreCase("down")) {
 			for (int i = 0; i < shipSize; i++) {
-					playerElements[coordinants[0] + i][coordinants[1]] = '#';
-					shipPlacement [coordinants[0] + i][coordinants[1]] = shipType;
+				playerElements[coordinants[0] + i][coordinants[1]] = '#';
+				shipPlacement[coordinants[0] + i][coordinants[1]] = shipType;
 			}
 		}
 		else if (direction.equalsIgnoreCase("right")) {
 			for (int i = 0; i < shipSize; i++) {
-					playerElements[coordinants[0]][coordinants[1] + i] = '#';
-					shipPlacement [coordinants[0]][coordinants[1] + i] = shipType;
+				playerElements[coordinants[0]][coordinants[1] + i] = '#';
+				shipPlacement[coordinants[0]][coordinants[1] + i] = shipType;
 			}
 		}
 		else if (direction.equalsIgnoreCase("up")) {
 			for (int i = 0; i < shipSize; i++) {
-					playerElements[coordinants[0] - i][coordinants[1]] = '#';
-					shipPlacement [coordinants[0] - i][coordinants[1]] = shipType;
+				playerElements[coordinants[0] - i][coordinants[1]] = '#';
+				shipPlacement[coordinants[0] - i][coordinants[1]] = shipType;
 			}
 		}
 		else if (direction.equalsIgnoreCase("left")) {
 			for (int i = 0; i < shipSize; i++) {
-					playerElements[coordinants[0]][coordinants[1] - i] = '#';
-					shipPlacement [coordinants[0]][coordinants[1] - i] = shipType;
+				playerElements[coordinants[0]][coordinants[1] - i] = '#';
+				shipPlacement[coordinants[0]][coordinants[1] - i] = shipType;
 			}
 		}
 	}
 
-	public static void makeAIField(char[][] playerElements, String[] ships){
-		for (int i = 0; i < 5; i++){
-			int randomDirection = (int) ((Math.random() * 4) + 1);
+	public static void makeAIField(char[][] playerElements, String[] ships) {
+		for (int i = 0; i < 5; i++) {
+			int randomDirection = newRandom(1, 4);
 			String directionWord = "";
-			switch(randomDirection){
-				case 1 : directionWord = "up";
-				break;
-				case 2 : directionWord = "right";
-				break;
-				case 3 : directionWord = "down";
-				break;
-				default : directionWord = "left";
-				break;
+			switch (randomDirection) {
+				case 1 :
+					directionWord = "up";
+					break;
+				case 2 :
+					directionWord = "right";
+					break;
+				case 3 :
+					directionWord = "down";
+					break;
+				default :
+					directionWord = "left";
+					break;
 			}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+
 		}
 	}
-	
+
 	/**
 	 * This method returns if there is a ship left on the field
 	 * 
 	 * @param fieldElements
-	 * 			char[][] - the board
+	 *            char[][] - the board
 	 * @return if the field has a ship on it
 	 */
-	public static boolean isAlive(char[][] fieldElements){
-		for (int i = 0; i < fieldElements.length; i++){
-			for (int j = 0; j < fieldElements[0].length; j++){
-				if (fieldElements[i][j] == '#'){
+	public static boolean isAlive(char[][] fieldElements) {
+		for (int i = 0; i < fieldElements.length; i++) {
+			for (int j = 0; j < fieldElements[0].length; j++) {
+				if (fieldElements[i][j] == '#') {
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * This method makes a random number
+	 * 
+	 * @param num1
+	 *            int - starting number
+	 * @param num2
+	 *            int - number you want to multiply by
+	 * @return (int) ((Math.random() * num2) + num1)
+	 */
+	public static int newRandom(int num1, int num2) {
+		return (int) ((Math.random() * num2) + num1);
 	}
 }
