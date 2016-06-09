@@ -1,7 +1,5 @@
 package nucci;
 
-import java.util.Scanner;
-
 import hsa_new.Console;
 
 /**
@@ -14,6 +12,13 @@ public class TextBasedBattleship {
 
 	public static boolean onePlayer = false;
 	public static Console console = new Console();
+	public static int turn = 1; // if turn is an odd number it is player 1's turn and vice versa
+	public static boolean destroyerSunk = false;
+	public static boolean cruiserSunk = false;
+	public static boolean submarineSunk = false;
+	public static boolean battleshipSunk = false;
+	public static boolean carrierSunk = false;
+
 	/**
 	 * This is the main method
 	 * 
@@ -142,13 +147,16 @@ public class TextBasedBattleship {
 		// end of the priliminary game and the start of the battling portion
 
 		while (isAlive(playerOneField) || isAlive(playerTwoField)) {
+			console.clear();
+			console.println("Where would you llike to shoot?");
+			turn++;
 			break;
 		}
 
 	}
 
 	/**
-	 * This method prints the field according to the char[][] of field elements
+	 * print the field according to the char[][] of field elements
 	 * 
 	 * @param playerElements
 	 *            - char[][] The predetermined field elements
@@ -181,10 +189,10 @@ public class TextBasedBattleship {
 
 	//@formatter:off
 	/**
-	 * This method turns a user input to 
+	 * turn a user input to broken up coordinants
 	 * 
 	 * @param userInput
-	 * 			- String the users input to be turned into coordinatnts
+	 * 			- String the users input to be turned into coordinants
 	 * @return an array of the coordinants for the board (minimum of 0, 0 and maximum 9, 9) and returns -1 if invalid  
 	 */
 	public static int[] makeCoords (String userInput){
@@ -244,7 +252,7 @@ public class TextBasedBattleship {
 	
 	//@formatter:on
 	/**
-	 * This method returns the number of players in the current game
+	 * return the number of players in the current game
 	 * 
 	 * @return the number of players in the current game (-1 if invalid)
 	 */
@@ -259,7 +267,7 @@ public class TextBasedBattleship {
 	}
 
 	/**
-	 * This method checks if a places a ship in the desired location on the board
+	 * check if a places a ship in the desired location on the board
 	 * 
 	 * @param playerElements
 	 *            char[][] - the board
@@ -346,7 +354,7 @@ public class TextBasedBattleship {
 	}
 
 	/**
-	 * This method places a ship in the desired location on the board
+	 * place a ship in the desired location on the board
 	 * 
 	 * @param playerElements
 	 *            char[][] - the board
@@ -402,6 +410,7 @@ public class TextBasedBattleship {
 		}
 	}
 
+	// TODO makeAIField method
 	public static void makeAIField(char[][] playerElements, String[] ships) {
 		for (int i = 0; i < 5; i++) {
 			int randomDirection = newRandom(1, 4);
@@ -425,7 +434,7 @@ public class TextBasedBattleship {
 	}
 
 	/**
-	 * This method returns if there is a ship left on the field
+	 * return if there is a ship left on the field
 	 * 
 	 * @param fieldElements
 	 *            char[][] - the board
@@ -443,7 +452,7 @@ public class TextBasedBattleship {
 	}
 
 	/**
-	 * This method makes a random number
+	 * make a random number
 	 * 
 	 * @param num1
 	 *            int - starting number
@@ -453,5 +462,106 @@ public class TextBasedBattleship {
 	 */
 	public static int newRandom(int num1, int num2) {
 		return (int) ((Math.random() * num2) + num1);
+	}
+
+	/**
+	 * make sure the shot at these coordinants is valid
+	 * 
+	 * @param playerElements
+	 *            char[][] - the board
+	 * @param shipPlacement
+	 *            String[][] - the ship locations with the names labeled
+	 * @param coordinants
+	 *            int[] - the coordinants of the shot
+	 * @return true if a vaild shot and false if not
+	 */
+	public static boolean isValidShot(char[][] playerElements, String[][] shipPlacement, int[] coordinants) {
+		try {
+			if (playerElements[coordinants[0]][coordinants[1]] == '#' || playerElements[coordinants[0]][coordinants[1]] == '~') {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		catch (ArrayIndexOutOfBoundsException ie) {
+			return false;
+		}
+	}
+
+	/**
+	 * take a shot at a coordinant on a field
+	 * 
+	 * @param playerElements
+	 *            char[][] - the board
+	 * @param shipPlacement
+	 *            String[][] - the ship locations with the names labelled
+	 * @param coordinants
+	 *            int[] - the coordinants of the shot
+	 */
+	public static void takeShot(char[][] playerElements, String[][] shipPlacement, int[] coordinants) {
+		if (playerElements[coordinants[0]][coordinants[1]] == '#') {
+			playerElements[coordinants[0]][coordinants[1]] = '!';
+			shipPlacement[coordinants[0]][coordinants[1]] += " - HIT";
+		}
+		else if (playerElements[coordinants[0]][coordinants[1]] == '~') {
+			playerElements[coordinants[0]][coordinants[1]] = '+';
+		}
+
+	}
+
+	/**
+	 * make a death message appear if the player destroyed a ship
+	 * 
+	 * @param shipPlacement
+	 *            String[][] - the ship locations with the names labelled
+	 */
+	public static void createDeathMessage(String[][] shipPlacement) {
+		int destroyerHits = 0;
+		int cruiserHits = 0;
+		int submarineHits = 0;
+		int battleshipHits = 0;
+		int carrierHits = 0;
+
+		for (int i = 0; i < shipPlacement.length; i++) {
+			for (int j = 0; j < shipPlacement[0].length; j++) {
+				if (shipPlacement[i][j].equalsIgnoreCase("Destroyer - HIT")) {
+					destroyerHits++;
+				}
+				else if (shipPlacement[i][j].equalsIgnoreCase("Cruiser - HIT")) {
+					cruiserHits++;
+				}
+				else if (shipPlacement[i][j].equalsIgnoreCase("Submarine - HIT")) {
+					submarineHits++;
+				}
+				else if (shipPlacement[i][j].equalsIgnoreCase("Battleship - HIT")) {
+					battleshipHits++;
+				}
+				else if (shipPlacement[i][j].equalsIgnoreCase("Aircraft Carrier - HIT")) {
+					carrierHits++;
+				}
+			}
+		}
+
+		if (destroyerHits == 2 && !destroyerSunk) {
+			console.println("You sunk your opponents destroyer.");
+			destroyerSunk = true;
+		}
+		else if (cruiserHits == 3 && !cruiserSunk) {
+			console.println("You sunk your opponents cruiser.");
+			cruiserSunk = true;
+		}
+		else if (submarineHits == 3 && !submarineSunk) {
+			console.println("You sunk your opponents submarine.");
+			submarineSunk = true;
+		}
+		else if (battleshipHits == 4 && !battleshipSunk) {
+			console.println("You sunk your opponents battleship.");
+			battleshipSunk = true;
+		}
+		else if (carrierHits == 5 && !carrierSunk) {
+			console.println("You sunk your opponents airship carrier.");
+			carrierSunk = true;
+		}
 	}
 }
