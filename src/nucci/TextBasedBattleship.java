@@ -20,6 +20,7 @@ public class TextBasedBattleship {
 	public static boolean submarineSunk = false;
 	public static boolean battleshipSunk = false;
 	public static boolean carrierSunk = false;
+	public static boolean hitLastShot = false;
 
 	/**
 	 * This is the main method
@@ -561,7 +562,6 @@ public class TextBasedBattleship {
 		}
 	}
 
-	//FIXME make me more complicated and smart
 	/**
 	 * make a new ai shot
 	 * 
@@ -571,17 +571,38 @@ public class TextBasedBattleship {
 	 *            String[][] - the ship locations with the names labelled
 	 */
 	public static void aiShoot(char[][] playerElements, String[][] shipPlacement) {
-		int[] coordinants = randomCoord(10, 10);
+		int[] coordinants = smartCoord();
 
 		if (isValidShot(playerElements, coordinants)) {
 			takeShot(playerElements, shipPlacement, coordinants);
+			if (playerElements[coordinants[0]][coordinants[1]] == '#'){
+				hitLastShot = true;
+			}
+			else{
+				hitLastShot = false;
+			}
 			printOpponentsField(playerElements);
+			createDeathMessage(shipPlacement);
 		}
-		else {
+		else{
 			turn--;
 		}
 	}
 
+	//FIXME im not complete and will not work (probably)
+	public static int[] smartCoord(){
+		int[] coordinants = new int[2];
+		
+		if(hitLastShot){
+			
+		}
+		else{
+			coordinants = randomCoord(10, 10);
+		}
+		
+		return coordinants;
+	}
+	
 	/**
 	 * return if there is a ship left on the field
 	 * 
