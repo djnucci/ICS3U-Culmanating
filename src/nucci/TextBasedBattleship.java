@@ -32,7 +32,7 @@ public class TextBasedBattleship {
 		console.setTextBackgroundColor(Color.BLACK);
 		console.setTextColor(Color.GREEN);
 		console.clear();
-		
+
 		String numberOfPlayers = "";
 
 		int[] currentCoordinants = new int[2];
@@ -62,7 +62,7 @@ public class TextBasedBattleship {
 
 		String[] playerOneShipDirections = new String[5];
 		String[] playerTwoShipDirections = new String[5];
-		
+
 		String playerOneShot = new String();
 		String playerTwoShot = new String();
 
@@ -105,7 +105,7 @@ public class TextBasedBattleship {
 				printPlayerField(playerOneField);
 			}
 			console.println("The AI will now set its field");
-
+			makeAIField(playerTwoField, playerTwoShipDirections, playerTwoShips);
 		}
 		else if (numberOfPlayers() == 2) {
 			console.clear();
@@ -157,19 +157,19 @@ public class TextBasedBattleship {
 
 		while (isAlive(playerOneField) && isAlive(playerTwoField)) {
 			console.clear();
-			if (turn % 2 == 1){
+			if (turn % 2 == 1) {
 				printOpponentsField(playerTwoField);
 				console.println("Where would you like to shoot, player 1?");
 				playerOneShot = console.readLine();
 				currentCoordinants = makeCoords(playerOneShot);
-				if (isValidShot(playerTwoField, currentCoordinants)){
+				if (isValidShot(playerTwoField, currentCoordinants)) {
 					takeShot(playerTwoField, playerTwoShips, currentCoordinants);
 					console.clear();
 					printOpponentsField(playerTwoField);
 					createDeathMessage(playerTwoShips);
 					Thread.sleep(3000);
 				}
-				else{
+				else {
 					console.println("Please enter a correct coordinant for your shot.");
 					console.println("(make sure that you haven't already shot there)");
 					Thread.sleep(2000);
@@ -177,23 +177,23 @@ public class TextBasedBattleship {
 				}
 				console.clear();
 			}
-			else{
-				if (singlePlayer){
-					//ai
+			else {
+				if (singlePlayer) {
+					aiShoot(playerOneField, playerOneShips);
 				}
-				else{
+				else {
 					printOpponentsField(playerOneField);
 					console.println("Where would you like to shoot, player 2?");
 					playerTwoShot = console.readLine();
 					currentCoordinants = makeCoords(playerTwoShot);
-					if (isValidShot(playerOneField, currentCoordinants)){
+					if (isValidShot(playerOneField, currentCoordinants)) {
 						takeShot(playerOneField, playerOneShips, currentCoordinants);
 						console.clear();
 						printOpponentsField(playerOneField);
 						createDeathMessage(playerOneShips);
 						Thread.sleep(3000);
 					}
-					else{
+					else {
 						console.println("Please enter a correct coordinant for your shot.");
 						console.println("(make sure that you haven't already shot there)");
 						Thread.sleep(2000);
@@ -205,18 +205,18 @@ public class TextBasedBattleship {
 			turn++;
 		}
 		console.clear();
-		if (isAlive(playerOneField)){
+		if (isAlive(playerOneField)) {
 			console.println("Congradulations player 1, you win!");
 		}
-		else if (isAlive(playerTwoField)){
-			if (!singlePlayer){
+		else if (isAlive(playerTwoField)) {
+			if (!singlePlayer) {
 				console.println("Congradulations player 2, you win!");
 			}
-			else{
+			else {
 				console.println("You lost to the AI, good job.");
 			}
 		}
-		else{
+		else {
 			console.println("You are the World Champion at life, you broke the game.");
 		}
 
@@ -260,20 +260,20 @@ public class TextBasedBattleship {
 	 * @param playerElements
 	 *            - char[][] The predetermined field elements
 	 */
-	public static void printOpponentsField(char[][] playerElements){
-		char[][] foggyField  = new char[10][10];
-		
+	public static void printOpponentsField(char[][] playerElements) {
+		char[][] foggyField = new char[10][10];
+
 		for (int i = 0; i < playerElements.length; i++) {
 			for (int j = 0; j < playerElements[0].length; j++) {
-				if (playerElements[i][j] != '#'){
+				if (playerElements[i][j] != '#') {
 					foggyField[i][j] = playerElements[i][j];
 				}
-				else{
+				else {
 					foggyField[i][j] = '~';
 				}
 			}
 		}
-		
+
 		console.println("    1   2   3   4   5   6   7   8   9  10  ");
 		console.println("  /---------------------------------------\\");
 		console.println("a | " + foggyField[0][0] + " | " + foggyField[0][1] + " | " + foggyField[0][2] + " | " + foggyField[0][3] + " | " + foggyField[0][4] + " | " + foggyField[0][5] + " | " + foggyField[0][6] + " | " + foggyField[0][7] + " | " + foggyField[0][8] + " | " + foggyField[0][9] + " |");
@@ -298,7 +298,7 @@ public class TextBasedBattleship {
 		console.println("  \\---------------------------------------/");
 
 	}
-	
+
 	//@formatter:off
 	/**
 	 * turn a user input to broken up coordinants
@@ -522,10 +522,20 @@ public class TextBasedBattleship {
 		}
 	}
 
-	// TODO makeAIField method
-	public static void makeAIField(char[][] playerElements, String[] ships) {
+	/**
+	 * the ai making a field filled with ships
+	 * 
+	 * @param aiElements
+	 *            char[][] - the ai's field elements
+	 * @param ships
+	 *            String[] - the list of ships
+	 * @param shipLocations
+	 *            String[][] - the location of each individual ship for recording purposes
+	 */
+	public static void makeAIField(char[][] aiElements, String[] ships, String[][] shipLocations) {
 		for (int i = 0; i < 5; i++) {
 			int randomDirection = newRandom(1, 4);
+			int[] randomPlace = randomCoord(10, 10);
 			String directionWord = "";
 			switch (randomDirection) {
 				case 1 :
@@ -541,7 +551,34 @@ public class TextBasedBattleship {
 					directionWord = "left";
 					break;
 			}
+			if (isValidShip(aiElements, randomPlace, ships[i], directionWord)) {
+				addShip(aiElements, shipLocations, randomPlace, ships[i], directionWord);
+			}
+			else {
+				i--;
+			}
 
+		}
+	}
+
+	//FIXME make me more complicated and smart
+	/**
+	 * make a new ai shot
+	 * 
+	 * @param playerElements
+	 *            char[][] - the board
+	 * @param shipPlacement
+	 *            String[][] - the ship locations with the names labelled
+	 */
+	public static void aiShoot(char[][] playerElements, String[][] shipPlacement) {
+		int[] coordinants = randomCoord(10, 10);
+
+		if (isValidShot(playerElements, coordinants)) {
+			takeShot(playerElements, shipPlacement, coordinants);
+			printOpponentsField(playerElements);
+		}
+		else {
+			turn--;
 		}
 	}
 
@@ -574,6 +611,21 @@ public class TextBasedBattleship {
 	 */
 	public static int newRandom(int num1, int num2) {
 		return (int) ((Math.random() * num2) + num1);
+	}
+
+	/**
+	 * make a new random coordinant point for a grid
+	 * 
+	 * @param x
+	 *            int - # of rows in the grid
+	 * @param y
+	 *            int - # of columns in the grid
+	 * @return
+	 */
+	public static int[] randomCoord(int x, int y) {
+		int[] coordinants = {newRandom(x, 0), newRandom(y, 0)};
+
+		return coordinants;
 	}
 
 	/**
