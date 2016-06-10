@@ -1,5 +1,7 @@
 package nucci;
 
+import java.awt.Color;
+
 import hsa_new.Console;
 
 /**
@@ -10,8 +12,8 @@ import hsa_new.Console;
  */
 public class TextBasedBattleship {
 
-	public static boolean onePlayer = false;
-	public static Console console = new Console();
+	public static boolean singlePlayer = false;
+	public static Console console = new Console(27, 80);
 	public static int turn = 1; // if turn is an odd number it is player 1's turn and vice versa
 	public static boolean destroyerSunk = false;
 	public static boolean cruiserSunk = false;
@@ -27,6 +29,10 @@ public class TextBasedBattleship {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
+		console.setTextBackgroundColor(Color.BLACK);
+		console.setTextColor(Color.GREEN);
+		console.clear();
+		
 		String numberOfPlayers = "";
 
 		int[] currentCoordinants = new int[2];
@@ -56,17 +62,20 @@ public class TextBasedBattleship {
 
 		String[] playerOneShipDirections = new String[5];
 		String[] playerTwoShipDirections = new String[5];
+		
+		String playerOneShot = new String();
+		String playerTwoShot = new String();
 
 		// start of the priliminary game
 		console.println("Please enter the number of players (One / Two)");
 		do {
 			numberOfPlayers = console.readLine();
 			if (numberOfPlayers.equalsIgnoreCase("One")) {
-				onePlayer = true;
+				singlePlayer = true;
 				error[0] = false;
 			}
 			else if (numberOfPlayers.equalsIgnoreCase("Two")) {
-				onePlayer = false;
+				singlePlayer = false;
 				error[0] = false;
 			}
 			else {
@@ -101,7 +110,7 @@ public class TextBasedBattleship {
 		else if (numberOfPlayers() == 2) {
 			console.clear();
 			console.println("Player 2 please look away from the screen as Player 1 inputs his ships.");
-			console.readChar();
+			Thread.sleep(5000);
 			console.clear();
 			printPlayerField(playerOneField);
 			for (int i = 0; i < 5; i++) {
@@ -123,7 +132,7 @@ public class TextBasedBattleship {
 			}
 			console.clear();
 			console.println("Player 1 please look away from the screen as Player 2 inputs his ships.");
-			console.readChar();
+			Thread.sleep(5000);
 			console.clear();
 			printPlayerField(playerTwoField);
 			for (int i = 0; i < 5; i++) {
@@ -144,13 +153,71 @@ public class TextBasedBattleship {
 				printPlayerField(playerTwoField);
 			}
 		}
-		// end of the priliminary game and the start of the battling portion
+		// end of the set-up and the start of the battling portion
 
-		while (isAlive(playerOneField) || isAlive(playerTwoField)) {
+		while (isAlive(playerOneField) && isAlive(playerTwoField)) {
 			console.clear();
-			console.println("Where would you llike to shoot?");
+			if (turn % 2 == 1){
+				printOpponentsField(playerTwoField);
+				console.println("Where would you like to shoot, player 1?");
+				playerOneShot = console.readLine();
+				currentCoordinants = makeCoords(playerOneShot);
+				if (isValidShot(playerTwoField, currentCoordinants)){
+					takeShot(playerTwoField, playerTwoShips, currentCoordinants);
+					console.clear();
+					printOpponentsField(playerTwoField);
+					createDeathMessage(playerTwoShips);
+					Thread.sleep(3000);
+				}
+				else{
+					console.println("Please enter a correct coordinant for your shot.");
+					console.println("(make sure that you haven't already shot there)");
+					Thread.sleep(2000);
+					turn--;
+				}
+				console.clear();
+			}
+			else{
+				if (singlePlayer){
+					//ai
+				}
+				else{
+					printOpponentsField(playerOneField);
+					console.println("Where would you like to shoot, player 2?");
+					playerTwoShot = console.readLine();
+					currentCoordinants = makeCoords(playerTwoShot);
+					if (isValidShot(playerOneField, currentCoordinants)){
+						takeShot(playerOneField, playerOneShips, currentCoordinants);
+						console.clear();
+						printOpponentsField(playerOneField);
+						createDeathMessage(playerOneShips);
+						Thread.sleep(3000);
+					}
+					else{
+						console.println("Please enter a correct coordinant for your shot.");
+						console.println("(make sure that you haven't already shot there)");
+						Thread.sleep(2000);
+						turn--;
+					}
+					console.clear();
+				}
+			}
 			turn++;
-			break;
+		}
+		console.clear();
+		if (isAlive(playerOneField)){
+			console.println("Congradulations player 1, you win!");
+		}
+		else if (isAlive(playerTwoField)){
+			if (!singlePlayer){
+				console.println("Congradulations player 2, you win!");
+			}
+			else{
+				console.println("You lost to the AI, good job.");
+			}
+		}
+		else{
+			console.println("You are the World Champion at life, you broke the game.");
 		}
 
 	}
@@ -187,6 +254,51 @@ public class TextBasedBattleship {
 
 	}
 
+	/**
+	 * print the field according to the char[][] of field elements without the ships
+	 * 
+	 * @param playerElements
+	 *            - char[][] The predetermined field elements
+	 */
+	public static void printOpponentsField(char[][] playerElements){
+		char[][] foggyField  = new char[10][10];
+		
+		for (int i = 0; i < playerElements.length; i++) {
+			for (int j = 0; j < playerElements[0].length; j++) {
+				if (playerElements[i][j] != '#'){
+					foggyField[i][j] = playerElements[i][j];
+				}
+				else{
+					foggyField[i][j] = '~';
+				}
+			}
+		}
+		
+		console.println("    1   2   3   4   5   6   7   8   9  10  ");
+		console.println("  /---------------------------------------\\");
+		console.println("a | " + foggyField[0][0] + " | " + foggyField[0][1] + " | " + foggyField[0][2] + " | " + foggyField[0][3] + " | " + foggyField[0][4] + " | " + foggyField[0][5] + " | " + foggyField[0][6] + " | " + foggyField[0][7] + " | " + foggyField[0][8] + " | " + foggyField[0][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("b | " + foggyField[1][0] + " | " + foggyField[1][1] + " | " + foggyField[1][2] + " | " + foggyField[1][3] + " | " + foggyField[1][4] + " | " + foggyField[1][5] + " | " + foggyField[1][6] + " | " + foggyField[1][7] + " | " + foggyField[1][8] + " | " + foggyField[1][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("c | " + foggyField[2][0] + " | " + foggyField[2][1] + " | " + foggyField[2][2] + " | " + foggyField[2][3] + " | " + foggyField[2][4] + " | " + foggyField[2][5] + " | " + foggyField[2][6] + " | " + foggyField[2][7] + " | " + foggyField[2][8] + " | " + foggyField[2][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("d | " + foggyField[3][0] + " | " + foggyField[3][1] + " | " + foggyField[3][2] + " | " + foggyField[3][3] + " | " + foggyField[3][4] + " | " + foggyField[3][5] + " | " + foggyField[3][6] + " | " + foggyField[3][7] + " | " + foggyField[3][8] + " | " + foggyField[3][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("e | " + foggyField[4][0] + " | " + foggyField[4][1] + " | " + foggyField[4][2] + " | " + foggyField[4][3] + " | " + foggyField[4][4] + " | " + foggyField[4][5] + " | " + foggyField[4][6] + " | " + foggyField[4][7] + " | " + foggyField[4][8] + " | " + foggyField[4][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("f | " + foggyField[5][0] + " | " + foggyField[5][1] + " | " + foggyField[5][2] + " | " + foggyField[5][3] + " | " + foggyField[5][4] + " | " + foggyField[5][5] + " | " + foggyField[5][6] + " | " + foggyField[5][7] + " | " + foggyField[5][8] + " | " + foggyField[5][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("g | " + foggyField[6][0] + " | " + foggyField[6][1] + " | " + foggyField[6][2] + " | " + foggyField[6][3] + " | " + foggyField[6][4] + " | " + foggyField[6][5] + " | " + foggyField[6][6] + " | " + foggyField[6][7] + " | " + foggyField[6][8] + " | " + foggyField[6][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("h | " + foggyField[7][0] + " | " + foggyField[7][1] + " | " + foggyField[7][2] + " | " + foggyField[7][3] + " | " + foggyField[7][4] + " | " + foggyField[7][5] + " | " + foggyField[7][6] + " | " + foggyField[7][7] + " | " + foggyField[7][8] + " | " + foggyField[7][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("i | " + foggyField[8][0] + " | " + foggyField[8][1] + " | " + foggyField[8][2] + " | " + foggyField[8][3] + " | " + foggyField[8][4] + " | " + foggyField[8][5] + " | " + foggyField[8][6] + " | " + foggyField[8][7] + " | " + foggyField[8][8] + " | " + foggyField[8][9] + " |");
+		console.println("  |---------------------------------------|");
+		console.println("j | " + foggyField[9][0] + " | " + foggyField[9][1] + " | " + foggyField[9][2] + " | " + foggyField[9][3] + " | " + foggyField[9][4] + " | " + foggyField[9][5] + " | " + foggyField[9][6] + " | " + foggyField[9][7] + " | " + foggyField[9][8] + " | " + foggyField[9][9] + " |");
+		console.println("  \\---------------------------------------/");
+
+	}
+	
 	//@formatter:off
 	/**
 	 * turn a user input to broken up coordinants
@@ -257,10 +369,10 @@ public class TextBasedBattleship {
 	 * @return the number of players in the current game (-1 if invalid)
 	 */
 	public static int numberOfPlayers() {
-		if (onePlayer) {
+		if (singlePlayer) {
 			return 1;
 		}
-		else if (!onePlayer) {
+		else if (!singlePlayer) {
 			return 2;
 		}
 		return -1;
@@ -468,14 +580,12 @@ public class TextBasedBattleship {
 	 * make sure the shot at these coordinants is valid
 	 * 
 	 * @param playerElements
-	 *            char[][] - the board
-	 * @param shipPlacement
-	 *            String[][] - the ship locations with the names labeled
+	 *            char[][] - the board of your opponent
 	 * @param coordinants
 	 *            int[] - the coordinants of the shot
 	 * @return true if a vaild shot and false if not
 	 */
-	public static boolean isValidShot(char[][] playerElements, String[][] shipPlacement, int[] coordinants) {
+	public static boolean isValidShot(char[][] playerElements, int[] coordinants) {
 		try {
 			if (playerElements[coordinants[0]][coordinants[1]] == '#' || playerElements[coordinants[0]][coordinants[1]] == '~') {
 				return true;
@@ -493,7 +603,7 @@ public class TextBasedBattleship {
 	 * take a shot at a coordinant on a field
 	 * 
 	 * @param playerElements
-	 *            char[][] - the board
+	 *            char[][] - the board of your opponent
 	 * @param shipPlacement
 	 *            String[][] - the ship locations with the names labelled
 	 * @param coordinants
