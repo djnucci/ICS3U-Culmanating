@@ -13,7 +13,7 @@ import hsa_new.Console;
 public class TextBasedBattleship {
 
 	public static boolean singlePlayer = false;
-	public static Console console = new Console(27, 80);
+	public static Console console = new Console(28, 84);
 	public static int turn = 1; // if turn is an odd number it is player 1's turn and vice versa
 	public static boolean destroyerSunk = false;
 	public static boolean cruiserSunk = false;
@@ -21,6 +21,8 @@ public class TextBasedBattleship {
 	public static boolean battleshipSunk = false;
 	public static boolean carrierSunk = false;
 	public static boolean hitLastShot = false;
+
+	public static int[] previousCoordinants = new int[2];
 
 	/**
 	 * This is the main method
@@ -107,7 +109,7 @@ public class TextBasedBattleship {
 				printPlayerField(playerOneField);
 			}
 			console.println("The AI will now set its field");
-			makeAIField(playerTwoField, playerTwoShipDirections, playerTwoShips);
+			makeAIField(playerTwoField, listOfShips, playerTwoShips);
 		}
 		else if (numberOfPlayers() == 2) {
 			console.clear();
@@ -536,23 +538,8 @@ public class TextBasedBattleship {
 	 */
 	public static void makeAIField(char[][] aiElements, String[] ships, String[][] shipLocations) {
 		for (int i = 0; i < 5; i++) {
-			int randomDirection = newRandom(1, 4);
 			int[] randomPlace = randomCoord(10, 10);
-			String directionWord = "";
-			switch (randomDirection) {
-				case 1 :
-					directionWord = "up";
-					break;
-				case 2 :
-					directionWord = "right";
-					break;
-				case 3 :
-					directionWord = "down";
-					break;
-				default :
-					directionWord = "left";
-					break;
-			}
+			String directionWord = randomDirection();
 			if (isValidShip(aiElements, randomPlace, ships[i], directionWord)) {
 				addShip(aiElements, shipLocations, randomPlace, ships[i], directionWord);
 			}
@@ -576,34 +563,59 @@ public class TextBasedBattleship {
 
 		if (isValidShot(playerElements, coordinants)) {
 			takeShot(playerElements, shipPlacement, coordinants);
-			if (playerElements[coordinants[0]][coordinants[1]] == '#'){
+			if (playerElements[coordinants[0]][coordinants[1]] == '#') {
 				hitLastShot = true;
+				previousCoordinants[0] = coordinants[0];
+				previousCoordinants[0] = coordinants[1];
 			}
-			else{
+			else {
 				hitLastShot = false;
 			}
 			printOpponentsField(playerElements);
 			createDeathMessage(shipPlacement);
 		}
-		else{
+		else {
 			turn--;
 		}
 	}
-
-	//FIXME im not complete and will not work (probably)
-	public static int[] smartCoord(){
+	
+	/**
+	 * make a coordinant for the ai's shot
+	 * 
+	 * @return the ai's shot coordinant
+	 */
+	public static int[] smartCoord() {
 		int[] coordinants = new int[2];
-		
-		if(hitLastShot){
-			
+
+		if (hitLastShot) {
+			String direction = randomDirection();
+
+			switch (direction) {
+				case "left" :
+					coordinants[1] = previousCoordinants[1] - 1;
+					coordinants[0] = previousCoordinants[0];
+					break;
+				case "right" :
+					coordinants[1] = previousCoordinants[1] + 1;
+					coordinants[0] = previousCoordinants[0];
+					break;
+				case "up" :
+					coordinants[0] = previousCoordinants[0] - 1;
+					coordinants[1] = previousCoordinants[1];
+					break;
+				case "down" :
+					coordinants[0] = previousCoordinants[0] + 1;
+					coordinants[1] = previousCoordinants[1];
+					break;
+			}
 		}
-		else{
+		else {
 			coordinants = randomCoord(10, 10);
 		}
-		
+
 		return coordinants;
 	}
-	
+
 	/**
 	 * return if there is a ship left on the field
 	 * 
@@ -642,10 +654,10 @@ public class TextBasedBattleship {
 	 *            int - # of rows in the grid
 	 * @param y
 	 *            int - # of columns in the grid
-	 * @return
+	 * @return an int array of the coordinants
 	 */
 	public static int[] randomCoord(int x, int y) {
-		int[] coordinants = {newRandom(x, 0), newRandom(y, 0)};
+		int[] coordinants = {newRandom(0, x), newRandom(0, y)};
 
 		return coordinants;
 	}
@@ -706,7 +718,8 @@ public class TextBasedBattleship {
 		int submarineHits = 0;
 		int battleshipHits = 0;
 		int carrierHits = 0;
-
+			
+		try{
 		for (int i = 0; i < shipPlacement.length; i++) {
 			for (int j = 0; j < shipPlacement[0].length; j++) {
 				if (shipPlacement[i][j].equalsIgnoreCase("Destroyer - HIT")) {
@@ -726,6 +739,7 @@ public class TextBasedBattleship {
 				}
 			}
 		}
+		}catch (NullPointerException ie){}
 
 		if (destroyerHits == 2 && !destroyerSunk) {
 			console.println("You sunk your opponents destroyer.");
@@ -747,5 +761,30 @@ public class TextBasedBattleship {
 			console.println("You sunk your opponents airship carrier.");
 			carrierSunk = true;
 		}
+	}
+
+	/**
+	 * make a random diection
+	 * 
+	 * @return the direction in all lower case letters
+	 */
+	public static String randomDirection() {
+		int randomDirection = newRandom(1, 4);
+		String directionWord = "";
+		switch (randomDirection) {
+			case 1 :
+				directionWord = "up";
+				break;
+			case 2 :
+				directionWord = "right";
+				break;
+			case 3 :
+				directionWord = "down";
+				break;
+			default :
+				directionWord = "left";
+				break;
+		}
+		return directionWord;
 	}
 }
