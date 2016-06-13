@@ -82,6 +82,7 @@ public class TextBasedBattleship {
 			else {
 				console.println("Please enter a valid answer");
 				Thread.sleep(1000);
+				console.clear();
 				error[0] = true;
 			}
 		} while (error[0]);
