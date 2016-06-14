@@ -40,7 +40,7 @@ public class TextBasedBattleship {
 
 		int[] currentCoordinants = new int[2];
 
-		boolean[] error = new boolean[10];
+		boolean error = false;
 
 		char[][] playerOneField = new char[10][10];
 		for (int i = 0; i < playerOneField.length; i++) {
@@ -75,20 +75,22 @@ public class TextBasedBattleship {
 			numberOfPlayers = console.readLine();
 			if (numberOfPlayers.equalsIgnoreCase("One")) {
 				singlePlayer = true;
-				error[0] = false;
+				error = false;
 			}
 			else if (numberOfPlayers.equalsIgnoreCase("Two")) {
 				singlePlayer = false;
-				error[0] = false;
+				error = false;
 			}
 			else {
 				console.println("Please enter a valid answer");
 				Thread.sleep(1000);
 				console.clear();
-				error[0] = true;
+				error = true;
 			}
-		} while (error[0]);
+		} while (error);
 		console.clear();
+		
+		//if there is only one player get all the inputs from the user and then set up the ai field
 		if (numberOfPlayers() == 1) {
 			printPlayerField(playerOneField);
 			for (int i = 0; i < 5; i++) {
@@ -111,6 +113,8 @@ public class TextBasedBattleship {
 			console.println("The AI will now set its field");
 			makeAIField(playerTwoField, listOfShips, playerTwoShips);
 		}
+		
+		//if there is two players get all the inputs from both users to set the field
 		else if (numberOfPlayers() == 2) {
 			console.clear();
 			console.println("Player 2 please look away from the screen as Player 1 inputs his ships.");
@@ -161,6 +165,8 @@ public class TextBasedBattleship {
 
 		while (isAlive(playerOneField) && isAlive(playerTwoField)) {
 			console.clear();
+			
+			//player 1's turn if the number of turns is odd
 			if (turn % 2 == 1) {
 				printOpponentsField(playerTwoField);
 				console.println("Where would you like to shoot, player 1?");
@@ -173,6 +179,7 @@ public class TextBasedBattleship {
 					createDeathMessage(playerTwoShips);
 					Thread.sleep(3000);
 				}
+				//if there was an invalid shot tell the user and subtract the turn
 				else {
 					console.println("Please enter a correct coordinant for your shot.");
 					console.println("(make sure that you haven't already shot there)");
@@ -181,9 +188,15 @@ public class TextBasedBattleship {
 				}
 				console.clear();
 			}
+			
+			//player 2's (or the ai's if single player is true) turn if the number of turns is even
 			else {
 				if (singlePlayer) {
 					aiShoot(playerOneField, playerOneShips);
+					console.clear();
+					printPlayerField(playerOneField);
+					Thread.sleep(3000);
+					console.clear();
 				}
 				else {
 					printOpponentsField(playerOneField);
@@ -197,6 +210,7 @@ public class TextBasedBattleship {
 						createDeathMessage(playerOneShips);
 						Thread.sleep(3000);
 					}
+					//if there was an invalid shot tell the user and subtract the turn
 					else {
 						console.println("Please enter a correct coordinant for your shot.");
 						console.println("(make sure that you haven't already shot there)");
@@ -206,8 +220,11 @@ public class TextBasedBattleship {
 					console.clear();
 				}
 			}
+			//add a turn every turn
 			turn++;
 		}
+		
+		//end game to see who beat who
 		console.clear();
 		if (isAlive(playerOneField)) {
 			console.println("Congradulations player 1, you win!");
@@ -221,7 +238,7 @@ public class TextBasedBattleship {
 			}
 		}
 		else {
-			console.println("You are the World Champion at life, you broke the game.");
+			console.println("Some how you broke the game.");
 		}
 
 	}
@@ -578,7 +595,7 @@ public class TextBasedBattleship {
 			turn--;
 		}
 	}
-	
+
 	/**
 	 * make a coordinant for the ai's shot
 	 * 
@@ -635,7 +652,7 @@ public class TextBasedBattleship {
 	}
 
 	/**
-	 * make a random number
+	 * make a random number (mostly redundant, i just felt like making it)
 	 * 
 	 * @param num1
 	 *            int - starting number
@@ -707,7 +724,7 @@ public class TextBasedBattleship {
 	}
 
 	/**
-	 * make a death message appear if the player destroyed a ship
+	 * make a death message appear if the player destroyed a ship (this is called after every shot taken)
 	 * 
 	 * @param shipPlacement
 	 *            String[][] - the ship locations with the names labelled
@@ -718,28 +735,31 @@ public class TextBasedBattleship {
 		int submarineHits = 0;
 		int battleshipHits = 0;
 		int carrierHits = 0;
-			
-		try{
+
 		for (int i = 0; i < shipPlacement.length; i++) {
 			for (int j = 0; j < shipPlacement[0].length; j++) {
-				if (shipPlacement[i][j].equalsIgnoreCase("Destroyer - HIT")) {
-					destroyerHits++;
+				try {
+					if (shipPlacement[i][j].equalsIgnoreCase("Destroyer - HIT")) {
+						destroyerHits++;
+					}
+					else if (shipPlacement[i][j].equalsIgnoreCase("Cruiser - HIT")) {
+						cruiserHits++;
+					}
+					else if (shipPlacement[i][j].equalsIgnoreCase("Submarine - HIT")) {
+						submarineHits++;
+					}
+					else if (shipPlacement[i][j].equalsIgnoreCase("Battleship - HIT")) {
+						battleshipHits++;
+					}
+					else if (shipPlacement[i][j].equalsIgnoreCase("Aircraft Carrier - HIT")) {
+						carrierHits++;
+					}
+
 				}
-				else if (shipPlacement[i][j].equalsIgnoreCase("Cruiser - HIT")) {
-					cruiserHits++;
-				}
-				else if (shipPlacement[i][j].equalsIgnoreCase("Submarine - HIT")) {
-					submarineHits++;
-				}
-				else if (shipPlacement[i][j].equalsIgnoreCase("Battleship - HIT")) {
-					battleshipHits++;
-				}
-				else if (shipPlacement[i][j].equalsIgnoreCase("Aircraft Carrier - HIT")) {
-					carrierHits++;
+				catch (NullPointerException ie) {
 				}
 			}
 		}
-		}catch (NullPointerException ie){}
 
 		if (destroyerHits == 2 && !destroyerSunk) {
 			console.println("You sunk your opponents destroyer.");
