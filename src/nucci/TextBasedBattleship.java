@@ -193,10 +193,6 @@ public class TextBasedBattleship {
 			else {
 				if (singlePlayer) {
 					aiShoot(playerOneField, playerOneShips);
-					console.clear();
-					printPlayerField(playerOneField);
-					Thread.sleep(3000);
-					console.clear();
 				}
 				else {
 					printOpponentsField(playerOneField);
@@ -574,8 +570,10 @@ public class TextBasedBattleship {
 	 *            char[][] - the board
 	 * @param shipPlacement
 	 *            String[][] - the ship locations with the names labelled
+	 * @param playerOneField 
+	 * @throws InterruptedException 
 	 */
-	public static void aiShoot(char[][] playerElements, String[][] shipPlacement) {
+	public static void aiShoot(char[][] playerElements, String[][] shipPlacement) throws InterruptedException {
 		int[] coordinants = smartCoord();
 
 		if (isValidShot(playerElements, coordinants)) {
@@ -590,6 +588,10 @@ public class TextBasedBattleship {
 			}
 			printOpponentsField(playerElements);
 			createDeathMessage(shipPlacement);
+			console.clear();
+			printPlayerField(playerElements);
+			Thread.sleep(3000);
+			console.clear();
 		}
 		else {
 			turn--;
