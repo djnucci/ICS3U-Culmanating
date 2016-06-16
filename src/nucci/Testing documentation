@@ -1,0 +1,10 @@
+Test Cases for ICS3U-Culminating
+
+Key points:
+-	"; " denotes an enter being pressed on the keyboard
+
+Test Case: #1
+
+Input: ‘two’; ’a, 1’; ‘down’; ‘a, 2’; ‘down’; ‘a, 3’; ‘down’; ‘a, 4’; ‘down’; ‘a, 5’; down’; ‘a, 1’; ‘down’; ‘a, 2’; ‘down’; ‘a, 3’; ‘down’; ‘a, 4; ‘down’; ‘a, 5’; ‘down’; ‘a, 1’; ‘a, 1’; ‘a, 2’; ‘a, 2’; ‘a, 3’; ‘a, 3’; ‘a, 4’; ‘a, 4’; ‘a, 5’; ‘a, 5’; ‘b, 1’; ‘b, 1’; ‘b, 2’; ‘b, 2’; ‘b, 3’; ‘b, 3’; ‘b, 4’; ‘b, 4’; ‘b, 5’; ‘b, 5’; ‘c, 2’; ‘c, 2’; ‘c, 3’; ‘c, 3’; ‘c, 4’; ‘c, 4’; ‘c, 5’; ‘c, 5’; ‘d, 4’; ‘d, 4’; ‘d, 5’; ‘d, 5’; ‘e, 5’; ‘no’;
+
+Output: This should start a two player game. After that both players have set their fields. Once this is done, the players will shoot each others ships inevitably the first player wins. Saying ‘no’ will end the game.

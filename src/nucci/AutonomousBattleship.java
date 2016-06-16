@@ -1,6 +1,8 @@
 package nucci;
 
 import java.awt.Color;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import hsa_new.Console;
 
@@ -24,15 +26,16 @@ public class AutonomousBattleship {
 
 	public static int turn = 1; // if turn is an odd number it is player 1's turn and vice versa
 	public static int[] previousCoordinants = new int[2];
-
+	
 	/**
 	 * This is the main method
 	 * 
 	 * @param args
 	 *            String[]
 	 * @throws InterruptedException
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 
 		do {
 			resetGlobals();
@@ -40,7 +43,7 @@ public class AutonomousBattleship {
 			console.setTextBackgroundColor(Color.BLACK);
 			console.setTextColor(Color.GREEN);
 			console.clear();
-
+			
 			String numberOfPlayers = "";
 			String playYesOrNo = "";
 
@@ -78,6 +81,7 @@ public class AutonomousBattleship {
 
 			// start of the priliminary game
 
+			
 			// if there is only one player get all the inputs from the user and then set up the ai field
 			makeAIField(playerOneField, listOfShips, playerOneShips);
 			makeAIField(playerTwoField, listOfShips, playerTwoShips);
@@ -480,6 +484,7 @@ public class AutonomousBattleship {
 			else {
 				hitLastShot = false;
 			}
+			
 		}
 		else {
 			turn--;
