@@ -5,7 +5,7 @@ import java.awt.Color;
 import hsa_new.Console;
 
 /**
- * This program is a text based battleship game
+ * This program is a text based battleship game for 1 - 2 players
  * 
  * @version June 1st, 2016
  * @author Daniel Nucci
