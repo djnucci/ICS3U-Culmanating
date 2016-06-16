@@ -5,13 +5,13 @@ import java.awt.Color;
 import hsa_new.Console;
 
 /**
- * This program is a text based battleship game for 1 - 2 players
+ * This program is FOR TESTS ONLY this is to help with debugging
  * 
  * @version June 1st, 2016
  * @author Daniel Nucci
  */
-public class TextBasedBattleship {
-	public static Console console = new Console(28, 84);
+public class AutonomousBattleship {
+	public static Console console = new Console(45, 100);
 
 	public static boolean singlePlayer = false;
 	public static boolean destroyerSunk = false;
@@ -77,159 +77,23 @@ public class TextBasedBattleship {
 			String playerTwoShot = new String();
 
 			// start of the priliminary game
-			do {
-				console.clear();
-				console.println("Please enter the number of players (One / Two)");
-				numberOfPlayers = console.readLine();
-				if (numberOfPlayers.equalsIgnoreCase("One")) {
-					singlePlayer = true;
-					error = false;
-				}
-				else if (numberOfPlayers.equalsIgnoreCase("Two")) {
-					singlePlayer = false;
-					error = false;
-				}
-				else {
-					console.println("Please enter a valid answer");
-					Thread.sleep(1000);
-					console.clear();
-					error = true;
-				}
-			} while (error);
-			console.clear();
 
 			// if there is only one player get all the inputs from the user and then set up the ai field
-			if (numberOfPlayers() == 1) {
-				printPlayerField(playerOneField);
-				for (int i = 0; i < 5; i++) {
-					console.println("Where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
-					playerOneShipLocations[i] = console.readLine();
-					currentCoordinants = makeCoords(playerOneShipLocations[i]);
-					console.println("What direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
-					playerOneShipDirections[i] = console.readLine();
-					if (isValidShip(playerOneField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
-						addShip(playerOneField, playerOneShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
-					}
-					else {
-						console.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
-						Thread.sleep(2000);
-						i--;
-					}
-					console.clear();
-					printPlayerField(playerOneField);
-				}
-				console.println("The AI will now set its field");
-				makeAIField(playerTwoField, listOfShips, playerTwoShips);
-			}
-
-			// if there is two players get all the inputs from both users to set the field
-			else if (numberOfPlayers() == 2) {
-				console.clear();
-				console.println("Player 2 please look away from the screen as Player 1 inputs his ships.");
-				Thread.sleep(5000);
-				console.clear();
-				printPlayerField(playerOneField);
-				for (int i = 0; i < 5; i++) {
-					console.println("Player 1 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
-					playerOneShipLocations[i] = console.readLine();
-					currentCoordinants = makeCoords(playerOneShipLocations[i]);
-					console.println("Player 1 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
-					playerOneShipDirections[i] = console.readLine();
-					if (isValidShip(playerOneField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
-						addShip(playerOneField, playerOneShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
-					}
-					else {
-						console.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
-						Thread.sleep(2000);
-						i--;
-					}
-					console.clear();
-					printPlayerField(playerOneField);
-				}
-				console.clear();
-				console.println("Player 1 please look away from the screen as Player 2 inputs his ships.");
-				Thread.sleep(5000);
-				console.clear();
-				printPlayerField(playerTwoField);
-				for (int i = 0; i < 5; i++) {
-					console.println("Player 2 where would you like to put your " + listOfShips[i] + "? (e.g. b, 5)");
-					playerTwoShipLocations[i] = console.readLine();
-					currentCoordinants = makeCoords(playerOneShipLocations[i]);
-					console.println("Player 2 what direction would you like to put your " + listOfShips[i] + "? (e.g. up, down)");
-					playerTwoShipDirections[i] = console.readLine();
-					if (isValidShip(playerTwoField, currentCoordinants, listOfShips[i], playerOneShipDirections[i])) {
-						addShip(playerTwoField, playerTwoShips, currentCoordinants, listOfShips[i], playerOneShipDirections[i]);
-					}
-					else {
-						console.println("That was not a valid input, please enter a correct input for your " + listOfShips[i] + ".");
-						Thread.sleep(2000);
-						i--;
-					}
-					console.clear();
-					printPlayerField(playerTwoField);
-				}
-			}
-			// end of the set-up and the start of the battling portion
+			makeAIField(playerOneField, listOfShips, playerOneShips);
+			makeAIField(playerTwoField, listOfShips, playerTwoShips);
 
 			while (isAlive(playerOneField) && isAlive(playerTwoField)) {
-				console.clear();
 
-				// player 1's turn if the number of turns is odd
 				if (turn % 2 == 1) {
-					printOpponentsField(playerTwoField);
-					console.println("Where would you like to shoot, player 1?");
-					playerOneShot = console.readLine();
-					currentCoordinants = makeCoords(playerOneShot);
-					if (isValidShot(playerTwoField, currentCoordinants)) {
-						takeShot(playerTwoField, playerTwoShips, currentCoordinants);
-						console.clear();
-						printOpponentsField(playerTwoField);
-						createDeathMessage(playerTwoShips);
-						Thread.sleep(3000);
-					}
-					// if there was an invalid shot tell the user and subtract the turn
-					else {
-						console.println("Please enter a correct coordinant for your shot.");
-						console.println("(make sure that you haven't already shot there)");
-						Thread.sleep(2000);
-						turn--;
-					}
-					console.clear();
+					aiShoot(playerTwoField, playerTwoShips);
+
 				}
 
-				// player 2's (or the ai's if single player is true) turn if the number of turns is even
 				else {
-					if (singlePlayer) {
-						aiShoot(playerOneField, playerOneShips);
-					}
-					else {
-						printOpponentsField(playerOneField);
-						console.println("Where would you like to shoot, player 2?");
-						playerTwoShot = console.readLine();
-						currentCoordinants = makeCoords(playerTwoShot);
-						if (isValidShot(playerOneField, currentCoordinants)) {
-							takeShot(playerOneField, playerOneShips, currentCoordinants);
-							console.clear();
-							printOpponentsField(playerOneField);
-							createDeathMessage(playerOneShips);
-							Thread.sleep(3000);
-						}
-						// if there was an invalid shot tell the user and subtract the turn
-						else {
-							console.println("Please enter a correct coordinant for your shot.");
-							console.println("(make sure that you haven't already shot there)");
-							Thread.sleep(2000);
-							turn--;
-						}
-						console.clear();
-					}
+					aiShoot(playerOneField, playerOneShips);
 				}
-				// add a turn every turn
 				turn++;
 			}
-
-			// end game to see who beat who
-			console.clear();
 			if (isAlive(playerOneField)) {
 				console.println("Congradulations player 1, you win!");
 			}
@@ -245,15 +109,17 @@ public class TextBasedBattleship {
 				console.println("Some how you broke the game.");
 			}
 
+			printPlayerField(playerOneField);
+			printPlayerField(playerTwoField);
 			do {
 				console.println("Would you like to play again?");
 				playYesOrNo = console.readLine();
 
-				if (playYesOrNo.equalsIgnoreCase("Yes")) {
+				if (playYesOrNo.equalsIgnoreCase("y")) {
 					playAgain = true;
 					againError = false;
 				}
-				else if (playYesOrNo.equalsIgnoreCase("No")) {
+				else if (playYesOrNo.equalsIgnoreCase("n")) {
 					playAgain = false;
 					againError = false;
 				}
@@ -275,28 +141,27 @@ public class TextBasedBattleship {
 	 *            - char[][] The predetermined field elements
 	 */
 	public static void printPlayerField(char[][] playerElements) {
-		console.println("    1   2   3   4   5   6   7   8   9  10  ");
-		console.println("  /---------------------------------------\\");
-		console.println("a | " + playerElements[0][0] + " | " + playerElements[0][1] + " | " + playerElements[0][2] + " | " + playerElements[0][3] + " | " + playerElements[0][4] + " | " + playerElements[0][5] + " | " + playerElements[0][6] + " | " + playerElements[0][7] + " | " + playerElements[0][8] + " | " + playerElements[0][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("b | " + playerElements[1][0] + " | " + playerElements[1][1] + " | " + playerElements[1][2] + " | " + playerElements[1][3] + " | " + playerElements[1][4] + " | " + playerElements[1][5] + " | " + playerElements[1][6] + " | " + playerElements[1][7] + " | " + playerElements[1][8] + " | " + playerElements[1][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("c | " + playerElements[2][0] + " | " + playerElements[2][1] + " | " + playerElements[2][2] + " | " + playerElements[2][3] + " | " + playerElements[2][4] + " | " + playerElements[2][5] + " | " + playerElements[2][6] + " | " + playerElements[2][7] + " | " + playerElements[2][8] + " | " + playerElements[2][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("d | " + playerElements[3][0] + " | " + playerElements[3][1] + " | " + playerElements[3][2] + " | " + playerElements[3][3] + " | " + playerElements[3][4] + " | " + playerElements[3][5] + " | " + playerElements[3][6] + " | " + playerElements[3][7] + " | " + playerElements[3][8] + " | " + playerElements[3][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("e | " + playerElements[4][0] + " | " + playerElements[4][1] + " | " + playerElements[4][2] + " | " + playerElements[4][3] + " | " + playerElements[4][4] + " | " + playerElements[4][5] + " | " + playerElements[4][6] + " | " + playerElements[4][7] + " | " + playerElements[4][8] + " | " + playerElements[4][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("f | " + playerElements[5][0] + " | " + playerElements[5][1] + " | " + playerElements[5][2] + " | " + playerElements[5][3] + " | " + playerElements[5][4] + " | " + playerElements[5][5] + " | " + playerElements[5][6] + " | " + playerElements[5][7] + " | " + playerElements[5][8] + " | " + playerElements[5][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("g | " + playerElements[6][0] + " | " + playerElements[6][1] + " | " + playerElements[6][2] + " | " + playerElements[6][3] + " | " + playerElements[6][4] + " | " + playerElements[6][5] + " | " + playerElements[6][6] + " | " + playerElements[6][7] + " | " + playerElements[6][8] + " | " + playerElements[6][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("h | " + playerElements[7][0] + " | " + playerElements[7][1] + " | " + playerElements[7][2] + " | " + playerElements[7][3] + " | " + playerElements[7][4] + " | " + playerElements[7][5] + " | " + playerElements[7][6] + " | " + playerElements[7][7] + " | " + playerElements[7][8] + " | " + playerElements[7][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("i | " + playerElements[8][0] + " | " + playerElements[8][1] + " | " + playerElements[8][2] + " | " + playerElements[8][3] + " | " + playerElements[8][4] + " | " + playerElements[8][5] + " | " + playerElements[8][6] + " | " + playerElements[8][7] + " | " + playerElements[8][8] + " | " + playerElements[8][9] + " |");
-		console.println("  |---------------------------------------|");
-		console.println("j | " + playerElements[9][0] + " | " + playerElements[9][1] + " | " + playerElements[9][2] + " | " + playerElements[9][3] + " | " + playerElements[9][4] + " | " + playerElements[9][5] + " | " + playerElements[9][6] + " | " + playerElements[9][7] + " | " + playerElements[9][8] + " | " + playerElements[9][9] + " |");
-		console.println("  \\---------------------------------------/");
+		console.println("/---------------------------------------\\");
+		console.println("| " + playerElements[0][0] + " | " + playerElements[0][1] + " | " + playerElements[0][2] + " | " + playerElements[0][3] + " | " + playerElements[0][4] + " | " + playerElements[0][5] + " | " + playerElements[0][6] + " | " + playerElements[0][7] + " | " + playerElements[0][8] + " | " + playerElements[0][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[1][0] + " | " + playerElements[1][1] + " | " + playerElements[1][2] + " | " + playerElements[1][3] + " | " + playerElements[1][4] + " | " + playerElements[1][5] + " | " + playerElements[1][6] + " | " + playerElements[1][7] + " | " + playerElements[1][8] + " | " + playerElements[1][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[2][0] + " | " + playerElements[2][1] + " | " + playerElements[2][2] + " | " + playerElements[2][3] + " | " + playerElements[2][4] + " | " + playerElements[2][5] + " | " + playerElements[2][6] + " | " + playerElements[2][7] + " | " + playerElements[2][8] + " | " + playerElements[2][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[3][0] + " | " + playerElements[3][1] + " | " + playerElements[3][2] + " | " + playerElements[3][3] + " | " + playerElements[3][4] + " | " + playerElements[3][5] + " | " + playerElements[3][6] + " | " + playerElements[3][7] + " | " + playerElements[3][8] + " | " + playerElements[3][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[4][0] + " | " + playerElements[4][1] + " | " + playerElements[4][2] + " | " + playerElements[4][3] + " | " + playerElements[4][4] + " | " + playerElements[4][5] + " | " + playerElements[4][6] + " | " + playerElements[4][7] + " | " + playerElements[4][8] + " | " + playerElements[4][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[5][0] + " | " + playerElements[5][1] + " | " + playerElements[5][2] + " | " + playerElements[5][3] + " | " + playerElements[5][4] + " | " + playerElements[5][5] + " | " + playerElements[5][6] + " | " + playerElements[5][7] + " | " + playerElements[5][8] + " | " + playerElements[5][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[6][0] + " | " + playerElements[6][1] + " | " + playerElements[6][2] + " | " + playerElements[6][3] + " | " + playerElements[6][4] + " | " + playerElements[6][5] + " | " + playerElements[6][6] + " | " + playerElements[6][7] + " | " + playerElements[6][8] + " | " + playerElements[6][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[7][0] + " | " + playerElements[7][1] + " | " + playerElements[7][2] + " | " + playerElements[7][3] + " | " + playerElements[7][4] + " | " + playerElements[7][5] + " | " + playerElements[7][6] + " | " + playerElements[7][7] + " | " + playerElements[7][8] + " | " + playerElements[7][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[8][0] + " | " + playerElements[8][1] + " | " + playerElements[8][2] + " | " + playerElements[8][3] + " | " + playerElements[8][4] + " | " + playerElements[8][5] + " | " + playerElements[8][6] + " | " + playerElements[8][7] + " | " + playerElements[8][8] + " | " + playerElements[8][9] + " |");
+		console.println("|---------------------------------------|");
+		console.println("| " + playerElements[9][0] + " | " + playerElements[9][1] + " | " + playerElements[9][2] + " | " + playerElements[9][3] + " | " + playerElements[9][4] + " | " + playerElements[9][5] + " | " + playerElements[9][6] + " | " + playerElements[9][7] + " | " + playerElements[9][8] + " | " + playerElements[9][9] + " |");
+		console.println("\\---------------------------------------/");
 
 	}
 
@@ -615,12 +480,6 @@ public class TextBasedBattleship {
 			else {
 				hitLastShot = false;
 			}
-			printOpponentsField(playerElements);
-			createDeathMessage(shipPlacement);
-			console.clear();
-			printPlayerField(playerElements);
-			Thread.sleep(3000);
-			console.clear();
 		}
 		else {
 			turn--;
