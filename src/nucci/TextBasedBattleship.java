@@ -1,6 +1,10 @@
 package nucci;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import hsa_new.Console;
 
@@ -12,6 +16,8 @@ import hsa_new.Console;
  */
 public class TextBasedBattleship {
 	public static Console console = new Console(28, 84);
+	
+	public static BufferedImage introScreen = null;
 
 	public static boolean singlePlayer = false;
 	public static boolean destroyerSunk = false;
@@ -35,7 +41,14 @@ public class TextBasedBattleship {
 	public static void main(String[] args) throws InterruptedException {
 
 		do {
+			//reset the global variables every round
 			resetGlobals();
+			
+			try{
+				introScreen = ImageIO.read(TextBasedBattleship.class.getResourceAsStream("/battleship.jpg"));
+			}catch (IOException ie){
+				ie.printStackTrace();
+			}
 
 			console.setTextBackgroundColor(Color.BLACK);
 			console.setTextColor(Color.GREEN);
@@ -79,6 +92,9 @@ public class TextBasedBattleship {
 			// start of the priliminary game
 			do {
 				console.clear();
+				
+				console.drawImage(introScreen, 0, 5, 500, 500, null);
+				
 				console.println("Please enter the number of players (One / Two)");
 				numberOfPlayers = console.readLine();
 				if (numberOfPlayers.equalsIgnoreCase("One")) {
